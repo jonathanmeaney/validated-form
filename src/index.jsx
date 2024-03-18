@@ -15,5 +15,5 @@ ReactDOM.render(
       <App />
     </CarbonProvider>
   </StrictMode>,
-  rootElement,
+  rootElement
 );

@@ -1,16 +1,15 @@
 import { useCallback, useState } from "react";
 
 const useFieldValidation = (errorSchema, warningSchema, infoSchema) => {
-  const [props, setProps] = useState({});
+  const [validationProps, setValidationProps] = useState({});
   const validate = useCallback(
     (value) => {
-      console.log("validating", value);
       try {
         if (errorSchema) {
           errorSchema.validateSync(value);
         }
       } catch (err) {
-        setProps({ error: err.message });
+        setValidationProps({ error: err.message });
         return err.message;
       }
 
@@ -19,7 +18,7 @@ const useFieldValidation = (errorSchema, warningSchema, infoSchema) => {
           warningSchema.validateSync(value);
         }
       } catch (err) {
-        setProps({ warning: err.message });
+        setValidationProps({ warning: err.message });
         return;
       }
 
@@ -28,15 +27,15 @@ const useFieldValidation = (errorSchema, warningSchema, infoSchema) => {
           infoSchema.validateSync(value);
         }
       } catch (err) {
-        setProps({ info: err.message });
+        setValidationProps({ info: err.message });
         return;
       }
 
-      setProps({});
+      setValidationProps({});
     },
-    [setProps, errorSchema, warningSchema, infoSchema],
+    [setValidationProps, errorSchema, warningSchema, infoSchema]
   );
-  return [validate, props];
+  return [validate, validationProps];
 };
 
 export default useFieldValidation;
@@ -44,10 +43,10 @@ export default useFieldValidation;
 export const useDateRangeValidation = (
   errorSchema,
   warningSchema,
-  infoSchema,
+  infoSchema
 ) => {
   const VALIDATION_OPTIONS = { abortEarly: false };
-  const [props, setProps] = useState({ startdate: {}, enddate: {} });
+  const [props, setValidationProps] = useState({ startdate: {}, enddate: {} });
   const validate = useCallback(
     (value) => {
       let newProps = {
@@ -91,11 +90,11 @@ export const useDateRangeValidation = (
         }
       }
 
-      setProps(newProps);
+      setValidationProps(newProps);
 
       return newProps.startdate.error || newProps.enddate.error;
     },
-    [setProps, errorSchema, warningSchema, infoSchema],
+    [setValidationProps, errorSchema, warningSchema, infoSchema]
   );
   return [validate, props];
 };

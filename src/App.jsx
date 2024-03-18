@@ -12,30 +12,6 @@ import ValidatedForm, {
 import "./styles.scss";
 
 export default function App() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    description: "",
-    agreeTerms: false,
-  });
-
-  const updateFormData = (e) => {
-    const { name, value, type } = e.target;
-
-    let updatedValue = value.formattedValue ? value.formattedValue : value;
-    if (type && type === "checkbox") {
-      const currentValue = formData[name];
-      updatedValue = !Boolean(currentValue);
-    }
-
-    setFormData((prevFormData) => {
-      return {
-        ...prevFormData,
-        [name]: updatedValue,
-      };
-    });
-  };
-
   const handleSubmit = (values) => {
     console.log("Submitting", values);
   };
@@ -64,17 +40,16 @@ export default function App() {
           label="First Name"
           labelInline
           name="firstName"
-          errorSchema={yup
-            .string()
-            .required("You have to pick one of the animals")}
+          required
+          errorSchema={yup.string().required("Please enter a first name")}
+          warningSchema={yup.string().min(2, "Please enter a longer name")}
         />
         <ValidatedTextbox
           label="Last Name"
           labelInline
           name="lastName"
-          errorSchema={yup
-            .string()
-            .required("You have to pick one of the animals")}
+          required
+          errorSchema={yup.string().required("Please enter a last name")}
         />
 
         <ValidatedTextbox
@@ -83,13 +58,23 @@ export default function App() {
           name="email"
           errorSchema={yup
             .string()
-            .email("You need to provide an email address.")}
+            .required("Please enter an email address")
+            .email("Please enter a valid email address.")}
         />
-        <ValidatedTextarea label="Description" labelInline name="description" />
+        <ValidatedTextarea
+          label="Description"
+          labelInline
+          name="description"
+          errorSchema={yup.string().required("Please enter a description")}
+        />
         <ValidatedCheckbox
           label="Agree to terms?"
           labelInline
           name="agreeTerms"
+          checked={false}
+          errorSchema={yup
+            .boolean()
+            .oneOf([true], "You must Accept Terms and Conditions")}
         />
       </ValidatedForm>
     </div>
