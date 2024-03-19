@@ -108,7 +108,7 @@ const ContextProvider = ({ initialState: propsInitialState, children }) => {
 
   const [state, dispatch] = useReducer(
     validatedFormReducer,
-    updatedInitialState
+    updatedInitialState,
   );
 
   const registerValidationProps = useCallback((name, validationProps) => {

@@ -35,7 +35,7 @@ const withFieldValidation = (Component) => {
     const [validate, validationProps] = useFieldValidation(
       errorSchema,
       warningSchema,
-      infoSchema
+      infoSchema,
     );
     const { touched, values } = useFormikContext();
     const fieldTouched = touched[fieldProps.name];
@@ -83,15 +83,56 @@ const withFieldValidation = (Component) => {
   return ValidatedComponent;
 };
 
-export const ValidatedTextbox = withFieldValidation(Textbox);
-export const ValidatedTextarea = withFieldValidation(Textarea);
-export const ValidatedCheckbox = withFieldValidation(Checkbox);
-export const ValidatedCheckboxGroup = withFieldValidation(CheckboxGroup);
-export const ValidatedDecimal = withFieldValidation(Decimal);
-export const ValidatedNumber = withFieldValidation(Number);
-export const ValidatedSelect = withFieldValidation(Select);
+import { isEqual } from "lodash";
+
+const areEqual = (prevProps, nextProps) => {
+  // Using Lodash isEqual to perform the comparison.
+  // https://lodash.com/docs/4.17.15#isEqual
+  return isEqual(prevProps, nextProps);
+};
+
+export const ValidatedTextbox = React.memo(
+  withFieldValidation(Textbox),
+  areEqual,
+);
+export const ValidatedTextarea = React.memo(
+  withFieldValidation(Textarea),
+  areEqual,
+);
+export const ValidatedCheckbox = React.memo(
+  withFieldValidation(Checkbox),
+  areEqual,
+);
+export const ValidatedCheckboxGroup = React.memo(
+  withFieldValidation(CheckboxGroup),
+  areEqual,
+);
+export const ValidatedDecimal = React.memo(
+  withFieldValidation(Decimal),
+  areEqual,
+);
+export const ValidatedNumber = React.memo(
+  withFieldValidation(Number),
+  areEqual,
+);
+export const ValidatedSelect = React.memo(
+  withFieldValidation(Select),
+  areEqual,
+);
 export { ValidatedOption };
-export const ValidatedDateInput = withFieldValidation(DateInput);
-export const ValidatedNumeralDate = withFieldValidation(NumeralDate);
-export const ValidatedRadioButton = withFieldValidation(RadioButton);
-export const ValidatedRadioButtonGroup = withFieldValidation(RadioButtonGroup);
+export const ValidatedDateInput = React.memo(
+  withFieldValidation(DateInput),
+  areEqual,
+);
+export const ValidatedNumeralDate = React.memo(
+  withFieldValidation(NumeralDate),
+  areEqual,
+);
+export const ValidatedRadioButton = React.memo(
+  withFieldValidation(RadioButton),
+  areEqual,
+);
+export const ValidatedRadioButtonGroup = React.memo(
+  withFieldValidation(RadioButtonGroup),
+  areEqual,
+);

@@ -64,7 +64,7 @@ const MessagesList = ({ messages }) => {
   );
 };
 
-const ValidationResults = ({ warningCount, errorCount, validationProps }) => {
+const ValidationSummary = ({ warningCount, errorCount, validationProps }) => {
   if (isEmpty(validationProps)) {
     return false;
   }
@@ -103,6 +103,7 @@ const ValidatedForm = ({
   ...formProps
 }) => {
   const { warningCount, errorCount, validationProps } = useValidatedForm();
+  console.log("rendering form");
 
   return (
     <Formik
@@ -122,7 +123,7 @@ const ValidatedForm = ({
       {({ handleSubmit }) => {
         return (
           <>
-            <ValidationResults
+            <ValidationSummary
               warningCount={warningCount}
               errorCount={errorCount}
               validationProps={validationProps}
