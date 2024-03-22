@@ -20,7 +20,6 @@ export default function App() {
     <div className="app">
       <h1>Validated Form Example</h1>
       <ValidatedForm
-        validateOnBlur
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
