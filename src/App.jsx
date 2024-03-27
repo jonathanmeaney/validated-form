@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import * as yup from "yup";
 
 import Button from "carbon-react/lib/components/button";
@@ -7,11 +7,48 @@ import ValidatedForm, {
   ValidatedTextbox,
   ValidatedTextarea,
   ValidatedCheckbox,
+  ValidatedDateInput,
 } from "./components/validated-form";
 
 import "./styles.scss";
 
-export default function App() {
+const PersonalDetails = () => {
+  return (
+    <>
+      <h4>Sub component</h4>
+      <ValidatedDateInput
+        label="Date of Birth"
+        labelInline
+        name="personalDetails.dob"
+        required
+        errorSchema={yup.string().required("Please enter a date of birth")}
+      />
+      <ValidatedTextbox
+        label="Address Line One"
+        labelInline
+        name="personalDetails.addressLineOne"
+        required
+        errorSchema={yup.string().required("Please enter address line")}
+      />
+      <ValidatedTextbox
+        label="Address Line Two"
+        labelInline
+        name="personalDetails.addressLineTwo"
+        required
+        errorSchema={yup.string().required("Please enter address line")}
+      />
+      <ValidatedTextbox
+        label="Address Line Three"
+        labelInline
+        name="personalDetails.addressLineThree"
+        required
+        errorSchema={yup.string().required("Please enter address line")}
+      />
+    </>
+  );
+};
+
+const App = () => {
   const handleSubmit = (values) => {
     console.log("Submitting", values);
   };
@@ -33,6 +70,12 @@ export default function App() {
           email: "",
           description: "",
           agreeTerms: false,
+          personalDetails: {
+            dob: "",
+            addressLineOne: "",
+            addressLineTwo: "",
+            addressLineThree: "",
+          },
         }}
       >
         <ValidatedTextbox
@@ -66,6 +109,7 @@ export default function App() {
           name="description"
           errorSchema={yup.string().required("Please enter a description")}
         />
+        <PersonalDetails />
         <ValidatedCheckbox
           label="Agree to terms?"
           labelInline
@@ -78,4 +122,6 @@ export default function App() {
       </ValidatedForm>
     </div>
   );
-}
+};
+
+export default App;

@@ -5,6 +5,8 @@ import { Formik } from "formik";
 
 import Form from "carbon-react/lib/components/form";
 import Message from "carbon-react/lib/components/message";
+import Typography from "carbon-react/lib/components/typography";
+import Link from "carbon-react/lib/components/link";
 
 import {
   ValidatedFormContextProvider,
@@ -48,7 +50,7 @@ const MessagesList = ({ messages }) => {
     <div>
       {Object.entries(messages).map(([key, value]) => (
         <div key={key}>
-          <b>{key}</b>
+          <Link href={`#${key}`}>{key}</Link>
           {value.length > 0 && (
             <>
               <ul>
@@ -64,31 +66,30 @@ const MessagesList = ({ messages }) => {
   );
 };
 
-const ValidationSummary = ({ warningCount, errorCount, validationProps }) => {
+const ValidationSummary = ({ errorCount, validationProps }) => {
   if (isEmpty(validationProps)) {
     return false;
   }
 
-  const { errors, warnings } = extractMessages(validationProps);
+  const { errors } = extractMessages(validationProps);
 
   const errorMessages = errorCount > 0 && (
-    <Message variant="error" open mb={1} title={`${errorCount} errors`}>
+    <Message
+      variant="error"
+      open
+      mb={5}
+      title={
+        <Typography
+          variant="h4"
+          mb={2}
+        >{`Please fix ${errorCount} errors`}</Typography>
+      }
+    >
       <MessagesList messages={errors} />
     </Message>
   );
 
-  const warningMessages = warningCount > 0 && (
-    <Message variant="warning" open mb={1} title={`${warningCount} warnings`}>
-      <MessagesList messages={warnings} />
-    </Message>
-  );
-
-  return (
-    <>
-      {errorMessages}
-      {warningMessages}
-    </>
-  );
+  return <>{errorMessages}</>;
 };
 
 const ValidatedForm = ({
@@ -124,7 +125,6 @@ const ValidatedForm = ({
         return (
           <>
             <ValidationSummary
-              warningCount={warningCount}
               errorCount={errorCount}
               validationProps={validationProps}
             />

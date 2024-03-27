@@ -6,7 +6,6 @@ import { Field, useFormikContext } from "formik";
 import Textbox from "carbon-react/lib/components/textbox";
 import Textarea from "carbon-react/lib/components/textarea";
 import { Checkbox, CheckboxGroup } from "carbon-react/lib/components/checkbox";
-import DateRange from "carbon-react/lib/components/date-range";
 import DateInput from "carbon-react/lib/components/date";
 import Decimal from "carbon-react/lib/components/decimal";
 import Number from "carbon-react/lib/components/number";
@@ -23,6 +22,20 @@ import {
 import { useValidatedForm } from "./validated-form-context";
 import useFieldValidation from "./useFieldValidation";
 
+const getObjectValue = (obj, path) => {
+  const parts = path.split(".");
+  let current = obj;
+
+  for (let part of parts) {
+    if (current[part] === undefined) {
+      return undefined;
+    }
+    current = current[part];
+  }
+
+  return current;
+};
+
 const withFieldValidation = (Component) => {
   const ValidatedComponent = ({
     errorSchema,
@@ -35,21 +48,23 @@ const withFieldValidation = (Component) => {
     const [validate, validationProps] = useFieldValidation(
       errorSchema,
       warningSchema,
-      infoSchema,
+      infoSchema
     );
-    const { touched, values } = useFormikContext();
-    const fieldTouched = touched[fieldProps.name];
+    const { touched, values, setFieldValue } = useFormikContext();
+    const fieldName = fieldProps.name;
+    const fieldTouched = getObjectValue(touched, fieldName);
+    const fieldLabel = fieldProps.label || fieldName;
 
     useEffect(() => {
       if (fieldTouched) {
-        if (!isEmpty(validationProps)) {
-          updateValidationProps(fieldProps.name, validationProps);
+        if (isEmpty(validationProps)) {
+          resetValidationProps(fieldLabel);
         } else {
-          resetValidationProps(fieldProps.name);
+          updateValidationProps(fieldLabel, validationProps);
         }
       }
     }, [
-      fieldProps.name,
+      fieldLabel,
       fieldTouched,
       resetValidationProps,
       updateValidationProps,
@@ -57,23 +72,35 @@ const withFieldValidation = (Component) => {
     ]);
 
     if (Component === Checkbox) {
-      const value = values[fieldProps.name];
+      const value = values[fieldName];
       fieldProps.checked = value;
       fieldProps.value = String(value);
     }
 
+    if (Component === DateInput) {
+      const originalOnChange = fieldProps.onChange;
+      const onChange = (e) => {
+        setFieldValue(fieldName, e.target.value.formattedValue);
+        if (originalOnChange) {
+          originalOnChange();
+        }
+      };
+      fieldProps.onChange = onChange;
+    }
+
     return (
-      <Field
-        {...fieldProps}
-        validate={validate}
-        as={Component}
-        {...(fieldTouched && validationProps)}
-      />
+      <div id={fieldLabel}>
+        <Field
+          {...fieldProps}
+          validate={validate}
+          as={Component}
+          {...(fieldTouched && validationProps)}
+        />
+      </div>
     );
   };
 
   ValidatedComponent.propTypes = {
-    ...Component.propTypes,
     name: PropTypes.string.isRequired,
     errorSchema: PropTypes.object,
     warningSchema: PropTypes.object,
@@ -93,46 +120,46 @@ const areEqual = (prevProps, nextProps) => {
 
 export const ValidatedTextbox = React.memo(
   withFieldValidation(Textbox),
-  areEqual,
+  areEqual
 );
 export const ValidatedTextarea = React.memo(
   withFieldValidation(Textarea),
-  areEqual,
+  areEqual
 );
 export const ValidatedCheckbox = React.memo(
   withFieldValidation(Checkbox),
-  areEqual,
+  areEqual
 );
 export const ValidatedCheckboxGroup = React.memo(
   withFieldValidation(CheckboxGroup),
-  areEqual,
+  areEqual
 );
 export const ValidatedDecimal = React.memo(
   withFieldValidation(Decimal),
-  areEqual,
+  areEqual
 );
 export const ValidatedNumber = React.memo(
   withFieldValidation(Number),
-  areEqual,
+  areEqual
 );
 export const ValidatedSelect = React.memo(
   withFieldValidation(Select),
-  areEqual,
+  areEqual
 );
 export { ValidatedOption };
 export const ValidatedDateInput = React.memo(
   withFieldValidation(DateInput),
-  areEqual,
+  areEqual
 );
 export const ValidatedNumeralDate = React.memo(
   withFieldValidation(NumeralDate),
-  areEqual,
+  areEqual
 );
 export const ValidatedRadioButton = React.memo(
   withFieldValidation(RadioButton),
-  areEqual,
+  areEqual
 );
 export const ValidatedRadioButtonGroup = React.memo(
   withFieldValidation(RadioButtonGroup),
-  areEqual,
+  areEqual
 );

@@ -10,13 +10,14 @@ import PropTypes from "prop-types";
 
 const initialState = {
   validationProps: {},
+  inputs: [],
   warningCount: 0,
   errorCount: 0,
 };
 
 export const actions = {
   SET_STATE: "SET_STATE",
-  REGISTER_VALIDATION_PROPS: "REGISTER_VALIDATION_PROPS",
+  REGISTER_INPUT: "REGISTER_INPUT",
   RESET_VALIDATION_PROPS: "RESET_VALIDATION_PROPS",
   UPDATE_VALIDATION_PROPS: "UPDATE_VALIDATION_PROPS",
 };
@@ -41,16 +42,13 @@ const countWarningsAndErrors = (validationProps) => {
 
 const validatedFormReducer = (state, action) => {
   switch (action.type) {
-    case actions.REGISTER_VALIDATION_PROPS: {
-      const { name, value } = action.payload;
-      const validationProps = {
-        ...state.validationProps,
-        [name]: value,
-      };
+    case actions.REGISTER_INPUT: {
+      const { input } = action.payload;
+      const inputs = [...state.inputs, input];
 
       return {
         ...state,
-        validationProps,
+        inputs,
       };
     }
     case actions.RESET_VALIDATION_PROPS: {
@@ -92,7 +90,7 @@ const validatedFormReducer = (state, action) => {
 
 const ValidatedFormContext = createContext({
   ...initialState,
-  registerValidationProps: () => {},
+  registerInput: () => {},
   resetValidationProps: () => {},
   updateValidationProps: () => {},
 });
@@ -108,13 +106,13 @@ const ContextProvider = ({ initialState: propsInitialState, children }) => {
 
   const [state, dispatch] = useReducer(
     validatedFormReducer,
-    updatedInitialState,
+    updatedInitialState
   );
 
-  const registerValidationProps = useCallback((name, validationProps) => {
+  const registerInput = useCallback((input) => {
     dispatch({
-      type: actions.REGISTER_VALIDATION_PROPS,
-      payload: { name, value: validationProps },
+      type: actions.REGISTER_INPUT,
+      payload: { input },
     });
   }, []);
 
@@ -141,9 +139,9 @@ const ContextProvider = ({ initialState: propsInitialState, children }) => {
       ...state,
       updateValidationProps,
       resetValidationProps,
-      registerValidationProps,
+      registerInput,
     };
-  }, [state, registerValidationProps, updateValidationProps]);
+  }, [state, registerInput, updateValidationProps]);
 
   return (
     <ValidatedFormContext.Provider value={value}>
