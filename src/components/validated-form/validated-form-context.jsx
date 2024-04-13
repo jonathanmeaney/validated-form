@@ -24,7 +24,7 @@ export const actions = {
 
 const countWarningsAndErrors = (validationProps) => {
   let [warningCount, errorCount] = [0, 0];
-  console.log("counting", validationProps);
+  // console.log("counting", validationProps);
   Object.entries(validationProps).forEach(([_, value]) => {
     if (value.error) {
       errorCount++;
@@ -106,7 +106,7 @@ const ContextProvider = ({ initialState: propsInitialState, children }) => {
 
   const [state, dispatch] = useReducer(
     validatedFormReducer,
-    updatedInitialState
+    updatedInitialState,
   );
 
   const registerInput = useCallback((input) => {
@@ -130,7 +130,7 @@ const ContextProvider = ({ initialState: propsInitialState, children }) => {
     });
   }, []);
 
-  console.log(state);
+  // console.log(state);
 
   // use useMemo for context value to prevent
   // needless rerenders.

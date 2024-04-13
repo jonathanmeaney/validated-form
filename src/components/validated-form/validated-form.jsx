@@ -104,13 +104,11 @@ const ValidatedForm = ({
   ...formProps
 }) => {
   const { warningCount, errorCount, validationProps } = useValidatedForm();
-  console.log("rendering form");
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, { validateForm }) => {
-        console.log("submit", values);
         // Validate the form one last time
         if (await validateForm()) {
           onSubmit(values);

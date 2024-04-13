@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { isEmpty } from "lodash";
+import { isEqual } from "lodash";
+
 import { Field, useFormikContext } from "formik";
 
 import Textbox from "carbon-react/lib/components/textbox";
@@ -48,7 +50,7 @@ const withFieldValidation = (Component) => {
     const [validate, validationProps] = useFieldValidation(
       errorSchema,
       warningSchema,
-      infoSchema
+      infoSchema,
     );
     const { touched, values, setFieldValue } = useFormikContext();
     const fieldName = fieldProps.name;
@@ -110,7 +112,6 @@ const withFieldValidation = (Component) => {
   return ValidatedComponent;
 };
 
-import { isEqual } from "lodash";
 
 const areEqual = (prevProps, nextProps) => {
   // Using Lodash isEqual to perform the comparison.
