@@ -15,7 +15,7 @@ import "./styles.scss";
 const PersonalDetails = () => {
   return (
     <>
-      <h4>Sub component</h4>
+      <h4>Nested component</h4>
       <ValidatedDateInput
         label="Date of Birth"
         labelInline
@@ -93,7 +93,6 @@ const App = () => {
           required
           errorSchema={yup.string().required("Please enter a last name")}
         />
-
         <ValidatedTextbox
           label="Email"
           labelInline
@@ -109,7 +108,6 @@ const App = () => {
           name="description"
           errorSchema={yup.string().required("Please enter a description")}
         />
-        <PersonalDetails />
         <ValidatedCheckbox
           label="Agree to terms?"
           labelInline
@@ -119,6 +117,7 @@ const App = () => {
             .boolean()
             .oneOf([true], "You must Accept Terms and Conditions")}
         />
+        <PersonalDetails />
       </ValidatedForm>
     </div>
   );
