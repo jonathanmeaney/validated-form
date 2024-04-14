@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { isEmpty } from "lodash";
 import { isEqual } from "lodash";
 
 import { Field, useFormikContext } from "formik";
@@ -39,39 +38,23 @@ const getObjectValue = (obj, path) => {
 };
 
 const withFieldValidation = (Component) => {
-  const ValidatedComponent = ({
-    errorSchema,
-    warningSchema,
-    infoSchema,
-    ...otherProps
-  }) => {
+  const ComponentWithRef = ({ innerRef, ...props }) => (
+    <Component ref={innerRef} {...props} />
+  );
+
+  const ValidatedComponent = ({ errorSchema, ...otherProps }) => {
     const fieldProps = { ...otherProps };
-    const { resetValidationProps, updateValidationProps } = useValidatedForm();
-    const [validate, validationProps] = useFieldValidation(
-      errorSchema,
-      warningSchema,
-      infoSchema,
-    );
+    const inputRef = useRef(null);
+
+    const { registerInputRef } = useValidatedForm();
+    const [validate, validationProps] = useFieldValidation(errorSchema);
     const { touched, values, setFieldValue } = useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
-    const fieldLabel = fieldProps.label || fieldName;
 
     useEffect(() => {
-      if (fieldTouched) {
-        if (isEmpty(validationProps)) {
-          resetValidationProps(fieldLabel);
-        } else {
-          updateValidationProps(fieldLabel, validationProps);
-        }
-      }
-    }, [
-      fieldLabel,
-      fieldTouched,
-      resetValidationProps,
-      updateValidationProps,
-      validationProps,
-    ]);
+      registerInputRef(fieldName, inputRef);
+    }, [inputRef]);
 
     if (Component === Checkbox) {
       const value = values[fieldName];
@@ -91,27 +74,23 @@ const withFieldValidation = (Component) => {
     }
 
     return (
-      <div id={fieldLabel}>
-        <Field
-          {...fieldProps}
-          validate={validate}
-          as={Component}
-          {...(fieldTouched && validationProps)}
-        />
-      </div>
+      <Field
+        {...fieldProps}
+        validate={validate}
+        as={ComponentWithRef}
+        {...(fieldTouched && validationProps)}
+        innerRef={inputRef}
+      />
     );
   };
 
   ValidatedComponent.propTypes = {
     name: PropTypes.string.isRequired,
     errorSchema: PropTypes.object,
-    warningSchema: PropTypes.object,
-    infoSchema: PropTypes.object,
   };
 
   return ValidatedComponent;
 };
-
 
 const areEqual = (prevProps, nextProps) => {
   // Using Lodash isEqual to perform the comparison.

@@ -1,17 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { isEmpty } from "lodash";
 import { Formik } from "formik";
 
 import Form from "carbon-react/lib/components/form";
-import Message from "carbon-react/lib/components/message";
-import Typography from "carbon-react/lib/components/typography";
-import Link from "carbon-react/lib/components/link";
 
-import {
-  ValidatedFormContextProvider,
-  useValidatedForm,
-} from "./validated-form-context";
+import { touchedErrors } from "./utils";
+import ValidationSummary from "./validation-summary";
+import { ValidatedFormContextProvider } from "./validated-form-context";
 
 const withContext = (Component) => {
   return (props) => {
@@ -23,75 +18,6 @@ const withContext = (Component) => {
   };
 };
 
-const extractMessages = (validationProps) => {
-  const errors = {};
-  const warnings = {};
-
-  for (const [key, value] of Object.entries(validationProps)) {
-    if (value.error) {
-      if (!errors[key]) {
-        errors[key] = [];
-      }
-      errors[key].push(value.error);
-    }
-    if (value.warning) {
-      if (!warnings[key]) {
-        warnings[key] = [];
-      }
-      warnings[key].push(value.warning);
-    }
-  }
-
-  return { errors, warnings };
-};
-
-const MessagesList = ({ messages }) => {
-  return (
-    <div>
-      {Object.entries(messages).map(([key, value]) => (
-        <div key={key}>
-          <Link href={`#${key}`}>{key}</Link>
-          {value.length > 0 && (
-            <>
-              <ul>
-                {value.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const ValidationSummary = ({ errorCount, validationProps }) => {
-  if (isEmpty(validationProps)) {
-    return false;
-  }
-
-  const { errors } = extractMessages(validationProps);
-
-  const errorMessages = errorCount > 0 && (
-    <Message
-      variant="error"
-      open
-      mb={5}
-      title={
-        <Typography
-          variant="h4"
-          mb={2}
-        >{`Please fix ${errorCount} errors`}</Typography>
-      }
-    >
-      <MessagesList messages={errors} />
-    </Message>
-  );
-
-  return <>{errorMessages}</>;
-};
-
 const ValidatedForm = ({
   initialValues,
   validationSchema,
@@ -101,14 +27,32 @@ const ValidatedForm = ({
   validateOnSubmit,
   onSubmit,
   children,
+  withSummary,
+  saveButton,
   ...formProps
 }) => {
-  const { warningCount, errorCount, validationProps } = useValidatedForm();
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+  const customSaveButton = () => {
+    const originalOnClick = saveButton.props.onClick;
+
+    const combinedOnClick = (e) => {
+      setAttemptedSubmit(true);
+
+      if (originalOnClick) {
+        originalOnClick(e);
+      }
+    };
+
+    return React.cloneElement(saveButton, {
+      disabled: attemptedSubmit,
+    });
+  };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, { validateForm }) => {
+        console.log("submitting");
         // Validate the form one last time
         if (await validateForm()) {
           onSubmit(values);
@@ -119,17 +63,20 @@ const ValidatedForm = ({
       validateOnBlur={!validateOnSubmit && validateOnBlur}
       validateOnMount={!validateOnSubmit && validateOnMount}
     >
-      {({ handleSubmit }) => {
+      {({ handleSubmit, touched, errors }) => {
+        const { errorCount, errorMessages } = touchedErrors(touched, errors);
         return (
           <>
-            <ValidationSummary
-              errorCount={errorCount}
-              validationProps={validationProps}
-            />
+            {withSummary && (
+              <ValidationSummary
+                errorCount={errorCount}
+                errorMessages={errorMessages}
+              />
+            )}
             <Form
               {...formProps}
+              saveButton={customSaveButton()}
               onSubmit={handleSubmit}
-              warningCount={warningCount}
               errorCount={errorCount}
             >
               {children}
@@ -150,6 +97,7 @@ ValidatedForm.propTypes = {
   validateOnSubmit: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
+  withSummary: PropTypes.bool,
 };
 
 ValidatedForm.defaultProps = {
@@ -157,6 +105,7 @@ ValidatedForm.defaultProps = {
   validateOnBlur: true,
   validateOnMount: false,
   validateOnSubmit: false,
+  withSummary: false,
 };
 
 ValidatedForm.displayName = "ValidatedForm";
