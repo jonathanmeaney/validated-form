@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-const useFieldValidation = (errorSchema, warningSchema, infoSchema) => {
+const useFieldValidation = (errorSchema) => {
   const [validationProps, setValidationProps] = useState({});
   const validate = useCallback(
     (value) => {
@@ -13,27 +13,9 @@ const useFieldValidation = (errorSchema, warningSchema, infoSchema) => {
         return err.message;
       }
 
-      try {
-        if (warningSchema) {
-          warningSchema.validateSync(value);
-        }
-      } catch (err) {
-        setValidationProps({ warning: err.message });
-        return;
-      }
-
-      try {
-        if (infoSchema) {
-          infoSchema.validateSync(value);
-        }
-      } catch (err) {
-        setValidationProps({ info: err.message });
-        return;
-      }
-
       setValidationProps({});
     },
-    [setValidationProps, errorSchema, warningSchema, infoSchema]
+    [setValidationProps, errorSchema]
   );
   return [validate, validationProps];
 };
