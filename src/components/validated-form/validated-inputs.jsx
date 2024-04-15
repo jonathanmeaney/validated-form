@@ -7,6 +7,7 @@ import { Field, useFormikContext } from "formik";
 import Textbox from "carbon-react/lib/components/textbox";
 import Textarea from "carbon-react/lib/components/textarea";
 import { Checkbox, CheckboxGroup } from "carbon-react/lib/components/checkbox";
+import Switch from "carbon-react/lib/components/switch";
 import DateInput from "carbon-react/lib/components/date";
 import Decimal from "carbon-react/lib/components/decimal";
 import Number from "carbon-react/lib/components/number";
@@ -37,6 +38,17 @@ const getObjectValue = (obj, path) => {
   return current;
 };
 
+const getValue = (e) => {
+  const { value, type, checked } = e.target;
+
+  let finalValue = value.formattedValue ? value.formattedValue : value;
+  if (type === "checkbox") {
+    finalValue = checked;
+  }
+
+  return finalValue;
+};
+
 const withFieldValidation = (Component) => {
   const ComponentWithRef = ({ innerRef, ...props }) => (
     <Component ref={innerRef} {...props} />
@@ -46,9 +58,15 @@ const withFieldValidation = (Component) => {
     const fieldProps = { ...otherProps };
     const inputRef = useRef(null);
 
-    const { registerInputRef } = useValidatedForm();
+    const {
+      registerInputRef,
+      validateOnBlur,
+      validateOnChange,
+      validateOnSubmit,
+    } = useValidatedForm();
     const [validate, validationProps] = useFieldValidation(errorSchema);
-    const { touched, values, setFieldValue } = useFormikContext();
+    const { touched, values, setFieldValue, setFieldTouched, validateField } =
+      useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
 
@@ -56,32 +74,56 @@ const withFieldValidation = (Component) => {
       registerInputRef(fieldName, inputRef);
     }, [inputRef]);
 
-    if (Component === Checkbox) {
+    if (Component === Checkbox || Component === Switch) {
       const value = values[fieldName];
       fieldProps.checked = value;
       fieldProps.value = String(value);
     }
 
-    if (Component === DateInput) {
-      const originalOnChange = fieldProps.onChange;
-      const onChange = (e) => {
-        setFieldValue(fieldName, e.target.value.formattedValue);
-        if (originalOnChange) {
-          originalOnChange();
-        }
-      };
-      fieldProps.onChange = onChange;
-    }
+    const canValidateOnBlur =
+      (validateOnSubmit && fieldTouched) || validateOnBlur;
+    const canValidateOnChange =
+      (validateOnSubmit && fieldTouched) || validateOnChange;
 
-    return (
-      <Field
-        {...fieldProps}
-        validate={validate}
-        as={ComponentWithRef}
-        {...(fieldTouched && validationProps)}
-        innerRef={inputRef}
-      />
-    );
+    const formikOnChange = (e) => {
+      setFieldValue(fieldName, getValue(e));
+
+      if (canValidateOnChange) {
+        // Call the incoming onChange function if specified on the component.
+        const { onChange } = { ...fieldProps };
+        if (onChange) {
+          onChange(e);
+        }
+      }
+    };
+
+    const formikOnBlur = (e) => {
+      setFieldValue(fieldName, getValue(e));
+      setFieldTouched(fieldName);
+
+      if (canValidateOnBlur) {
+        validateField(fieldName);
+
+        // Call the incoming onBlur function if specified on the component.
+        const { onBlur } = { ...fieldProps };
+        if (onBlur) {
+          onBlur(e);
+        }
+      }
+    };
+
+    if (validate)
+      return (
+        <Field
+          {...fieldProps}
+          validate={validate}
+          as={ComponentWithRef}
+          {...(fieldTouched && validationProps)}
+          innerRef={inputRef}
+          onChange={formikOnChange}
+          onBlur={formikOnBlur}
+        />
+      );
   };
 
   ValidatedComponent.propTypes = {
@@ -112,6 +154,10 @@ export const ValidatedCheckbox = React.memo(
 );
 export const ValidatedCheckboxGroup = React.memo(
   withFieldValidation(CheckboxGroup),
+  areEqual
+);
+export const ValidatedSwitch = React.memo(
+  withFieldValidation(Switch),
   areEqual
 );
 export const ValidatedDecimal = React.memo(

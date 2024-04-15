@@ -11,7 +11,12 @@ import { ValidatedFormContextProvider } from "./validated-form-context";
 const withContext = (Component) => {
   return (props) => {
     return (
-      <ValidatedFormContextProvider>
+      <ValidatedFormContextProvider
+        validateOnMount={props.validateOnMount}
+        validateOnBlur={props.validateOnBlur}
+        validateOnChange={props.validateOnChange}
+        validateOnSubmit={props.validateOnSubmit}
+      >
         <Component {...props} />
       </ValidatedFormContextProvider>
     );
@@ -31,20 +36,16 @@ const ValidatedForm = ({
   saveButton,
   ...formProps
 }) => {
-  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const customSaveButton = () => {
-    const originalOnClick = saveButton.props.onClick;
-
-    const combinedOnClick = (e) => {
-      setAttemptedSubmit(true);
-
+    const originalOnClick = saveButton.onClick;
+    const combinedOnClick = () => {
       if (originalOnClick) {
-        originalOnClick(e);
+        originalOnClick();
       }
     };
 
     return React.cloneElement(saveButton, {
-      disabled: attemptedSubmit,
+      onClick: combinedOnClick,
     });
   };
 
@@ -52,7 +53,6 @@ const ValidatedForm = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, { validateForm }) => {
-        console.log("submitting");
         // Validate the form one last time
         if (await validateForm()) {
           onSubmit(values);
@@ -67,7 +67,7 @@ const ValidatedForm = ({
         const { errorCount, errorMessages } = touchedErrors(touched, errors);
         return (
           <>
-            {withSummary && (
+            {(withSummary || validateOnSubmit) && (
               <ValidationSummary
                 errorCount={errorCount}
                 errorMessages={errorMessages}
