@@ -10,6 +10,10 @@ import PropTypes from "prop-types";
 
 const initialState = {
   inputRefs: {},
+  validateOnMount: false,
+  validateOnBlur: false,
+  validateOnChange: false,
+  validateOnSubmit: false,
 };
 
 export const actions = {
@@ -43,10 +47,21 @@ const ValidatedFormContext = createContext({
 // Custom hook to access validatedForm context value
 const useValidatedForm = () => useContext(ValidatedFormContext);
 
-const ContextProvider = ({ initialState: propsInitialState, children }) => {
+const ContextProvider = ({
+  initialState: propsInitialState,
+  children,
+  validateOnMount,
+  validateOnBlur,
+  validateOnChange,
+  validateOnSubmit,
+}) => {
   const updatedInitialState = {
     ...initialState,
     ...propsInitialState,
+    validateOnMount,
+    validateOnBlur,
+    validateOnChange,
+    validateOnSubmit,
   };
 
   const [state, dispatch] = useReducer(
@@ -85,10 +100,18 @@ ContextProvider.propTypes = {
     PropTypes.node,
   ]).isRequired,
   initialState: PropTypes.object,
+  validateOnMount: PropTypes.bool,
+  validateOnBlur: PropTypes.bool,
+  validateOnChange: PropTypes.bool,
+  validateOnSubmit: PropTypes.bool,
 };
 
 ContextProvider.defaultProps = {
   initialState: {},
+  validateOnMount: false,
+  validateOnBlur: false,
+  validateOnChange: false,
+  validateOnSubmit: false,
 };
 
 // Use React.memo to prevent rerenders when unnecessary.
