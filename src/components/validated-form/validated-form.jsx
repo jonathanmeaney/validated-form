@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo } from "react";
 import PropTypes from "prop-types";
 import { Formik } from "formik";
 
@@ -8,55 +8,44 @@ import { touchedErrors } from "./utils";
 import ValidationSummary from "./validation-summary";
 import { ValidatedFormContextProvider } from "./validated-form-context";
 
-const withContext = (Component) => {
-  return (props) => {
-    return (
-      <ValidatedFormContextProvider
-        validateOnMount={props.validateOnMount}
-        validateOnBlur={props.validateOnBlur}
-        validateOnChange={props.validateOnChange}
-        validateOnSubmit={props.validateOnSubmit}
-      >
-        <Component {...props} />
-      </ValidatedFormContextProvider>
-    );
-  };
-};
+const withContext = (Component) =>
+  memo((props) => (
+    <ValidatedFormContextProvider
+      validateOnMount={props.validateOnMount}
+      validateOnBlur={props.validateOnBlur || true}
+      validateOnChange={props.validateOnChange}
+      validateOnSubmit={props.validateOnSubmit}
+    >
+      <Component {...props} />
+    </ValidatedFormContextProvider>
+  ));
+
+const CustomSaveButton = ({ onClick, saveButton }) =>
+  React.cloneElement(saveButton, {
+    onClick: () => onClick && onClick(),
+  });
 
 const ValidatedForm = ({
   initialValues,
   validationSchema,
-  validateOnChange,
-  validateOnBlur,
-  validateOnMount,
-  validateOnSubmit,
+  validateOnChange = false,
+  validateOnBlur = true,
+  validateOnMount = false,
+  validateOnSubmit = false,
   onSubmit,
   children,
-  withSummary,
+  withSummary = false,
+  summaryTitle,
   saveButton,
   ...formProps
 }) => {
-  const customSaveButton = () => {
-    const originalOnClick = saveButton.onClick;
-    const combinedOnClick = () => {
-      if (originalOnClick) {
-        originalOnClick();
-      }
-    };
-
-    return React.cloneElement(saveButton, {
-      onClick: combinedOnClick,
-    });
-  };
-
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, { validateForm }) => {
         // Validate the form one last time
-        if (await validateForm()) {
-          onSubmit(values);
-        }
+        const isValid = await validateForm();
+        if (isValid) onSubmit(values);
       }}
       validationSchema={validationSchema}
       validateOnChange={!validateOnSubmit && validateOnChange}
@@ -71,11 +60,17 @@ const ValidatedForm = ({
               <ValidationSummary
                 errorCount={errorCount}
                 errorMessages={errorMessages}
+                summaryTitle={summaryTitle}
               />
             )}
             <Form
               {...formProps}
-              saveButton={customSaveButton()}
+              saveButton={
+                <CustomSaveButton
+                  onClick={saveButton?.onClick}
+                  saveButton={saveButton}
+                />
+              }
               onSubmit={handleSubmit}
               errorCount={errorCount}
             >
@@ -98,14 +93,7 @@ ValidatedForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
   withSummary: PropTypes.bool,
-};
-
-ValidatedForm.defaultProps = {
-  validateOnChange: false,
-  validateOnBlur: true,
-  validateOnMount: false,
-  validateOnSubmit: false,
-  withSummary: false,
+  summaryTitle: PropTypes.string,
 };
 
 ValidatedForm.displayName = "ValidatedForm";

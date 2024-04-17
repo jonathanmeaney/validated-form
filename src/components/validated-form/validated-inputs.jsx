@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useCallback, useRef, memo } from "react";
 import PropTypes from "prop-types";
 import { isEqual } from "lodash";
 
@@ -38,21 +38,47 @@ const getObjectValue = (obj, path) => {
   return current;
 };
 
-const getValue = (e) => {
-  const { value, type, checked } = e.target;
+const getValue = ({ target: { value, type, checked } }) =>
+  type === "checkbox" ? checked : value.formattedValue || value;
 
-  let finalValue = value.formattedValue ? value.formattedValue : value;
-  if (type === "checkbox") {
-    finalValue = checked;
-  }
+const useFieldHandlers = (
+  fieldName,
+  canValidateOnBlur,
+  canValidateOnChange,
+  fieldProps
+) => {
+  const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
 
-  return finalValue;
+  const handleEvent = useCallback(
+    (eventName, canValidate) => (e) => {
+      setFieldValue(fieldName, getValue(e));
+      setFieldTouched(fieldName, true);
+      if (canValidate) {
+        validateField(fieldName);
+        fieldProps[eventName]?.(e, {
+          validateField,
+          setFieldValue,
+          setFieldTouched,
+        });
+      }
+    },
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
+  );
+
+  return {
+    onChange: handleEvent("onChange", canValidateOnChange),
+    onBlur: handleEvent("onBlur", canValidateOnBlur),
+  };
 };
 
 const withFieldValidation = (Component) => {
-  const ComponentWithRef = ({ innerRef, ...props }) => (
-    <Component ref={innerRef} {...props} />
-  );
+  const ComponentWithRef = ({ innerRef, ...props }) => {
+    if ([RadioButtonGroup, CheckboxGroup].includes(Component)) {
+      return <Component {...props} />;
+    }
+
+    return <Component ref={innerRef} {...props} />;
+  };
 
   const ValidatedComponent = ({ errorSchema, ...otherProps }) => {
     const fieldProps = { ...otherProps };
@@ -65,8 +91,7 @@ const withFieldValidation = (Component) => {
       validateOnSubmit,
     } = useValidatedForm();
     const [validate, validationProps] = useFieldValidation(errorSchema);
-    const { touched, values, setFieldValue, setFieldTouched, validateField } =
-      useFormikContext();
+    const { touched, values } = useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
 
@@ -74,118 +99,56 @@ const withFieldValidation = (Component) => {
       registerInputRef(fieldName, inputRef);
     }, [inputRef]);
 
-    if (Component === Checkbox || Component === Switch) {
-      const value = values[fieldName];
-      fieldProps.checked = value;
-      fieldProps.value = String(value);
-    }
-
     const canValidateOnBlur =
-      (validateOnSubmit && fieldTouched) || validateOnBlur;
+      (validateOnSubmit && fieldTouched) ||
+      (!validateOnSubmit && validateOnBlur);
     const canValidateOnChange =
-      (validateOnSubmit && fieldTouched) || validateOnChange;
+      (validateOnSubmit && fieldTouched) ||
+      (!validateOnSubmit && validateOnChange);
 
-    const formikOnChange = (e) => {
-      setFieldValue(fieldName, getValue(e));
+    const { onChange, onBlur } = useFieldHandlers(
+      fieldName,
+      canValidateOnBlur,
+      canValidateOnChange,
+      fieldProps
+    );
 
-      if (canValidateOnChange) {
-        // Call the incoming onChange function if specified on the component.
-        const { onChange } = { ...fieldProps };
-        if (onChange) {
-          onChange(e);
-        }
-      }
-    };
+    const checkboxProps = [Checkbox, Switch].includes(Component)
+      ? { checked: values[fieldName], value: String(values[fieldName]) }
+      : {};
 
-    const formikOnBlur = (e) => {
-      setFieldValue(fieldName, getValue(e));
-      setFieldTouched(fieldName);
-
-      if (canValidateOnBlur) {
-        validateField(fieldName);
-
-        // Call the incoming onBlur function if specified on the component.
-        const { onBlur } = { ...fieldProps };
-        if (onBlur) {
-          onBlur(e);
-        }
-      }
-    };
-
-    if (validate)
-      return (
-        <Field
-          {...fieldProps}
-          validate={validate}
-          as={ComponentWithRef}
-          {...(fieldTouched && validationProps)}
-          innerRef={inputRef}
-          onChange={formikOnChange}
-          onBlur={formikOnBlur}
-        />
-      );
+    return (
+      <Field
+        {...fieldProps}
+        {...checkboxProps}
+        validate={validate}
+        as={ComponentWithRef}
+        {...(fieldTouched && validationProps)}
+        innerRef={inputRef}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+    );
   };
 
   ValidatedComponent.propTypes = {
     name: PropTypes.string.isRequired,
-    errorSchema: PropTypes.object,
+    innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
   };
 
-  return ValidatedComponent;
+  return memo(ValidatedComponent, isEqual);
 };
 
-const areEqual = (prevProps, nextProps) => {
-  // Using Lodash isEqual to perform the comparison.
-  // https://lodash.com/docs/4.17.15#isEqual
-  return isEqual(prevProps, nextProps);
-};
-
-export const ValidatedTextbox = React.memo(
-  withFieldValidation(Textbox),
-  areEqual
-);
-export const ValidatedTextarea = React.memo(
-  withFieldValidation(Textarea),
-  areEqual
-);
-export const ValidatedCheckbox = React.memo(
-  withFieldValidation(Checkbox),
-  areEqual
-);
-export const ValidatedCheckboxGroup = React.memo(
-  withFieldValidation(CheckboxGroup),
-  areEqual
-);
-export const ValidatedSwitch = React.memo(
-  withFieldValidation(Switch),
-  areEqual
-);
-export const ValidatedDecimal = React.memo(
-  withFieldValidation(Decimal),
-  areEqual
-);
-export const ValidatedNumber = React.memo(
-  withFieldValidation(Number),
-  areEqual
-);
-export const ValidatedSelect = React.memo(
-  withFieldValidation(Select),
-  areEqual
-);
+export const ValidatedTextbox = withFieldValidation(Textbox);
+export const ValidatedTextarea = withFieldValidation(Textarea);
+export const ValidatedCheckbox = withFieldValidation(Checkbox);
+export const ValidatedCheckboxGroup = withFieldValidation(CheckboxGroup);
+export const ValidatedSwitch = withFieldValidation(Switch);
+export const ValidatedDecimal = withFieldValidation(Decimal);
+export const ValidatedNumber = withFieldValidation(Number);
+export const ValidatedSelect = withFieldValidation(Select);
 export { ValidatedOption };
-export const ValidatedDateInput = React.memo(
-  withFieldValidation(DateInput),
-  areEqual
-);
-export const ValidatedNumeralDate = React.memo(
-  withFieldValidation(NumeralDate),
-  areEqual
-);
-export const ValidatedRadioButton = React.memo(
-  withFieldValidation(RadioButton),
-  areEqual
-);
-export const ValidatedRadioButtonGroup = React.memo(
-  withFieldValidation(RadioButtonGroup),
-  areEqual
-);
+export const ValidatedDateInput = withFieldValidation(DateInput);
+export const ValidatedNumeralDate = withFieldValidation(NumeralDate);
+export const ValidatedRadioButton = withFieldValidation(RadioButton);
+export const ValidatedRadioButtonGroup = withFieldValidation(RadioButtonGroup);

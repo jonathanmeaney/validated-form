@@ -60,7 +60,8 @@ const App = () => {
     <div className="app">
       <h1>Validated Form Example</h1>
       <ValidatedForm
-        validateOnSubmit
+        // validateOnSubmit
+        // validateOnChange
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
@@ -90,6 +91,10 @@ const App = () => {
           name="firstName"
           required
           errorSchema={yup.string().required("First Name is required")}
+          onBlur={(_, { validateField, setFieldTouched }) => {
+            validateField("lastName");
+            setFieldTouched("lastName");
+          }}
         />
         <ValidatedTextbox
           label="Last Name"
