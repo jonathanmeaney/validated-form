@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import I18n from "i18n-js";
 import { isEmpty } from "lodash";
 import styled from "styled-components";
 
@@ -8,6 +9,10 @@ import Typography from "carbon-react/lib/components/typography";
 import Link from "carbon-react/lib/components/link";
 
 import { useValidatedForm } from "./validated-form-context";
+
+import "./i18n.js";
+
+const i18nScope = "validated_form.validation_summary";
 
 const LinkRow = styled.div`
   margin-bottom: 10px;
@@ -40,21 +45,21 @@ const ErrorMessagesList = ({ errorMessages }) => {
   });
 };
 
-const ValidationSummary = ({ errorCount, errorMessages }) => {
+const ValidationSummary = ({ errorCount, errorMessages, summaryTitle }) => {
   if (isEmpty(errorMessages)) {
     return false;
   }
-
+  const title =
+    summaryTitle || I18n.t(`${i18nScope}.title`, { count: errorCount });
   const message = (
     <Message
       variant="error"
       open
       mb={5}
       title={
-        <Typography
-          variant="b"
-          mb={2}
-        >{`There are ${errorCount} errors`}</Typography>
+        <Typography variant="b" mb={2}>
+          {title}
+        </Typography>
       }
     >
       <ErrorMessagesList errorMessages={errorMessages} />
@@ -67,6 +72,7 @@ const ValidationSummary = ({ errorCount, errorMessages }) => {
 ValidationSummary.propTypes = {
   errorCount: PropTypes.number,
   errorMessages: PropTypes.object,
+  summaryTitle: PropTypes.string,
 };
 
 export default ValidationSummary;

@@ -39,16 +39,21 @@ const getObjectValue = (obj, path) => {
 };
 
 const getValue = ({ target: { value, type, checked } }) =>
-  type === "checkbox" ? checked : value.formattedValue || value;
+  type === "checkbox"
+    ? checked
+    : value.formattedValue !== undefined
+      ? value.formattedValue
+      : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps
+  fieldProps,
 ) => {
-  const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
-
+  const { setFieldValue, setFieldTouched, validateField, ...rest } =
+    useFormikContext();
+  // console.log(rest);
   const handleEvent = useCallback(
     (eventName, canValidate) => (e) => {
       setFieldValue(fieldName, getValue(e));
@@ -62,7 +67,7 @@ const useFieldHandlers = (
         });
       }
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
   );
 
   return {
@@ -80,7 +85,10 @@ const withFieldValidation = (Component) => {
     return <Component ref={innerRef} {...props} />;
   };
 
-  const ValidatedComponent = ({ errorSchema, ...otherProps }) => {
+  const ValidatedComponent = ({
+    validate: validateFromInput,
+    ...otherProps
+  }) => {
     const fieldProps = { ...otherProps };
     const inputRef = useRef(null);
 
@@ -90,29 +98,34 @@ const withFieldValidation = (Component) => {
       validateOnChange,
       validateOnSubmit,
     } = useValidatedForm();
-    const [validate, validationProps] = useFieldValidation(errorSchema);
-    const { touched, values } = useFormikContext();
+    const [validate, validationProps] = useFieldValidation(validateFromInput);
+    const { touched, errors, values } = useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
+    const fieldError = getObjectValue(errors, fieldName);
 
+    // Register the components inputRef with the context. Used to set focus
+    // from the ValidationSummary.
     useEffect(() => {
       registerInputRef(fieldName, inputRef);
     }, [inputRef]);
 
+    // Determine if and when you should be able to validate or revalidate a field
     const canValidateOnBlur =
-      (validateOnSubmit && fieldTouched) ||
-      (!validateOnSubmit && validateOnBlur);
+      validateOnBlur && (!validateOnSubmit || (validateOnSubmit && fieldError));
     const canValidateOnChange =
-      (validateOnSubmit && fieldTouched) ||
-      (!validateOnSubmit && validateOnChange);
+      validateOnChange &&
+      (!validateOnSubmit || (validateOnSubmit && fieldError));
 
+    // Define the onChange and onBlur event handlers for the field
     const { onChange, onBlur } = useFieldHandlers(
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps
+      fieldProps,
     );
 
+    // Checkbox type components need some additional fields set: checked and value
     const checkboxProps = [Checkbox, Switch].includes(Component)
       ? { checked: values[fieldName], value: String(values[fieldName]) }
       : {};

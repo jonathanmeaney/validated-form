@@ -18,8 +18,8 @@ dependencies:
     specifier: 2.4.5
     version: 2.4.5(react@17.0.2)
   i18n-js:
-    specifier: latest
-    version: 4.4.3
+    specifier: http://github.com/fnando/i18n-js/archive/v3.0.0.rc12.tar.gz
+    version: '@github.com/fnando/i18n-js/archive/v3.0.0.rc12.tar.gz'
   lodash:
     specifier: 4.17.21
     version: 4.17.21
@@ -3077,10 +3077,6 @@ packages:
     resolution: {integrity: sha512-NzUnlZexiaH/46WDhANlyR2bXRopNg4F/zuSA3OpZnllCUgRaOF2znDioDWrmbNVsuZk6l9pMquQB38cfBZwkQ==}
     dev: false
 
-  /bignumber.js@9.1.2:
-    resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
-    dev: false
-
   /binary-extensions@2.2.0:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
@@ -4830,14 +4826,6 @@ packages:
       ms: 2.1.3
     dev: false
 
-  /i18n-js@4.4.3:
-    resolution: {integrity: sha512-QIIyvJ+wOKdigL4BlgwiFFrpoXeGdlC8EYgori64YSWm1mnhNYYjIfRu5wETFrmiNP2fyD6xIjVG8dlzaiQr/A==}
-    dependencies:
-      bignumber.js: 9.1.2
-      lodash: 4.17.21
-      make-plural: 7.3.0
-    dev: false
-
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
@@ -5934,10 +5922,6 @@ packages:
     transitivePeerDependencies:
       - bluebird
       - supports-color
-    dev: false
-
-  /make-plural@7.3.0:
-    resolution: {integrity: sha512-/K3BC0KIsO+WK2i94LkMPv3wslMrazrQhfi5We9fMbLlLjzoOSJWr7TAdupLlDWaJcWxwoNosBkhFDejiu5VDw==}
     dev: false
 
   /makeerror@1.0.12:
@@ -7938,4 +7922,10 @@ packages:
       tiny-case: 1.0.3
       toposort: 2.0.2
       type-fest: 2.19.0
+    dev: false
+
+  '@github.com/fnando/i18n-js/archive/v3.0.0.rc12.tar.gz':
+    resolution: {tarball: http://github.com/fnando/i18n-js/archive/v3.0.0.rc12.tar.gz}
+    name: i18n-js
+    version: 0.0.0
     dev: false

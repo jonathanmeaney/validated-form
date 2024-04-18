@@ -24,28 +24,28 @@ const PersonalDetails = () => {
         labelInline
         name="personalDetails.dob"
         required
-        errorSchema={yup.string().required("Date of Birth is required")}
+        validate={yup.string().required("Date of Birth is required")}
       />
       <ValidatedTextbox
         label="Address Line One"
         labelInline
         name="personalDetails.addressLineOne"
         required
-        errorSchema={yup.string().required("Address Line One is required")}
+        validate={yup.string().required("Address Line One is required")}
       />
       <ValidatedTextbox
         label="Address Line Two"
         labelInline
         name="personalDetails.addressLineTwo"
         required
-        errorSchema={yup.string().required("Address Line Two is required")}
+        validate={yup.string().required("Address Line Two is required")}
       />
       <ValidatedTextbox
         label="Address Line Three"
         labelInline
         name="personalDetails.addressLineThree"
         required
-        errorSchema={yup.string().required("Address Line Three is required")}
+        validate={yup.string().required("Address Line Three is required")}
       />
     </>
   );
@@ -56,12 +56,19 @@ const App = () => {
     console.log("Submitting", values);
   };
 
+  const validate = (value) => {
+    let errorMessage;
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
+      errorMessage = "Invalid email address";
+    }
+    return errorMessage;
+  };
+
   return (
     <div className="app">
-      <h1>Validated Form Example</h1>
+      <h1>Validated Form Example - validation per input</h1>
       <ValidatedForm
-        // validateOnSubmit
-        // validateOnChange
+        validateOnSubmit
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
@@ -76,7 +83,7 @@ const App = () => {
           description: "",
           agreeTerms: false,
           enableSpyware: false,
-          hotDogSize: "",
+          accountType: "",
           personalDetails: {
             dob: "",
             addressLineOne: "",
@@ -90,7 +97,7 @@ const App = () => {
           labelInline
           name="firstName"
           required
-          errorSchema={yup.string().required("First Name is required")}
+          validate={yup.string().required("First Name is required")}
           onBlur={(_, { validateField, setFieldTouched }) => {
             validateField("lastName");
             setFieldTouched("lastName");
@@ -101,24 +108,21 @@ const App = () => {
           labelInline
           name="lastName"
           required
-          errorSchema={yup.string().required("Last Name is required")}
+          validate={yup.string().required("Last Name is required")}
         />
         <ValidatedTextbox
           label="Email"
           labelInline
           name="email"
           required
-          errorSchema={yup
-            .string()
-            .required("Email is required")
-            .email("Email should be a valid email address.")}
+          validate={validate}
         />
         <ValidatedTextarea
           label="Description"
           labelInline
           name="description"
           required
-          errorSchema={yup.string().required("Description is required")}
+          validate={yup.string().required("Description is required")}
         />
         <ValidatedCheckbox
           label="Agree to terms?"
@@ -126,7 +130,7 @@ const App = () => {
           name="agreeTerms"
           checked={false}
           required
-          errorSchema={yup
+          validate={yup
             .boolean()
             .oneOf([true], "You must Accept Terms and Conditions")}
         />
@@ -136,26 +140,61 @@ const App = () => {
           name="enableSpyware"
           checked={false}
           required
-          errorSchema={yup.boolean().oneOf([true], "You must enable spyware")}
+          validate={yup.boolean().oneOf([true], "You must enable spyware")}
         />
         <ValidatedRadioButtonGroup
-          legend="Hot dog size"
-          name="hotDogSize"
-          errorSchema={yup.string().required("Hot dog size is required")}
+          legend="Account Type"
+          name="accountType"
+          validate={yup.string().required("Account Type is required")}
         >
-          <ValidatedRadioButton id="radio-one-1" value="large" label="Large" />
+          <ValidatedRadioButton
+            id="radio-one-1"
+            value="super-manager"
+            label="Super Manager"
+          />
           <ValidatedRadioButton
             id="radio-one-2"
-            value="extra-large"
-            label="Extra Large"
+            value="manager"
+            label="Manager"
           />
           <ValidatedRadioButton
             id="radio-one-3"
-            value="obscene"
-            label="Obscene"
+            value="employee"
+            label="Employee"
           />
         </ValidatedRadioButtonGroup>
-        <PersonalDetails />
+      </ValidatedForm>
+      <hr />
+      <h1>Validated Form Example - validation schema</h1>
+      <ValidatedForm
+        validationSchema={yup.object({
+          firstName: yup.string().required("First Name is required"),
+          lastName: yup.string().required("Last Name is required"),
+        })}
+        leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
+        saveButton={
+          <Button buttonType="primary" type="submit">
+            Save
+          </Button>
+        }
+        onSubmit={handleSubmit}
+        initialValues={{
+          firstName: "",
+          lastName: "",
+        }}
+      >
+        <ValidatedTextbox
+          label="First Name"
+          labelInline
+          name="firstName"
+          required
+        />
+        <ValidatedTextbox
+          label="Last Name"
+          labelInline
+          name="lastName"
+          required
+        />
       </ValidatedForm>
     </div>
   );

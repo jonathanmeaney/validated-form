@@ -1,7 +1,7 @@
 {
-  "name": "carbon-basic-template",
+  "name": "validated-form-concept",
   "version": "1.0.0",
-  "description": "Basic template importing Carbon and its required packages",
+  "description": "A new ValidatedForm concept for modernised form validations.",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
@@ -9,7 +9,7 @@
     "carbon-react": "latest",
     "core-js": "latest",
     "formik": "2.4.5",
-    "i18n-js": "latest",
+    "i18n-js": "http://github.com/fnando/i18n-js/archive/v3.0.0.rc12.tar.gz",
     "lodash": "4.17.21",
     "node-sass": "latest",
     "prop-types": "^15.8.1",
