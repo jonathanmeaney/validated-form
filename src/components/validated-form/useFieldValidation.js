@@ -1,31 +1,28 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
-const useFieldValidation = (validateFunction) => {
-  const [validationProps, setValidationProps] = useState({});
+const useFieldValidation = (inputValidate) => {
   const validate = useCallback(
     (value) => {
-      if (validateFunction) {
-        if (validateFunction.validateSync) {
-          try {
-            validateFunction.validateSync(value);
-          } catch (err) {
-            setValidationProps({ error: err.message });
-            return err.message;
-          }
-          setValidationProps({});
-        } else {
-          const result = validateFunction(value);
-          console.log("vallated", result);
-          if (result) {
-            setValidationProps({ error: result });
-            return result;
-          }
+      if (!inputValidate) return;
+
+      if (inputValidate.validateSync) {
+        try {
+          inputValidate.validateSync(value);
+        } catch (err) {
+          return err.message;
+        }
+      } else {
+        try {
+          return inputValidate(value);
+        } catch (err) {
+          console.error(err);
+          return;
         }
       }
     },
-    [setValidationProps, validateFunction],
+    [inputValidate]
   );
-  return [validate, validationProps];
+  return validate;
 };
 
 export default useFieldValidation;

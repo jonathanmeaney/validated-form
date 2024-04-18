@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef, memo } from "react";
 import PropTypes from "prop-types";
-import { isEqual } from "lodash";
+import { isEqual, isEmpty } from "lodash";
 
 import { Field, useFormikContext } from "formik";
 
@@ -42,14 +42,14 @@ const getValue = ({ target: { value, type, checked } }) =>
   type === "checkbox"
     ? checked
     : value.formattedValue !== undefined
-      ? value.formattedValue
-      : value;
+    ? value.formattedValue
+    : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps,
+  fieldProps
 ) => {
   const { setFieldValue, setFieldTouched, validateField, ...rest } =
     useFormikContext();
@@ -67,7 +67,7 @@ const useFieldHandlers = (
         });
       }
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
   );
 
   return {
@@ -98,11 +98,12 @@ const withFieldValidation = (Component) => {
       validateOnChange,
       validateOnSubmit,
     } = useValidatedForm();
-    const [validate, validationProps] = useFieldValidation(validateFromInput);
+    const validate = useFieldValidation(validateFromInput);
     const { touched, errors, values } = useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
     const fieldError = getObjectValue(errors, fieldName);
+    const error = fieldTouched && fieldError ? { error: fieldError } : {};
 
     // Register the components inputRef with the context. Used to set focus
     // from the ValidationSummary.
@@ -122,7 +123,7 @@ const withFieldValidation = (Component) => {
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps,
+      fieldProps
     );
 
     // Checkbox type components need some additional fields set: checked and value
@@ -136,7 +137,7 @@ const withFieldValidation = (Component) => {
         {...checkboxProps}
         validate={validate}
         as={ComponentWithRef}
-        {...(fieldTouched && validationProps)}
+        {...error}
         innerRef={inputRef}
         onChange={onChange}
         onBlur={onBlur}

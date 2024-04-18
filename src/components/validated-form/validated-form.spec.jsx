@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -57,30 +57,35 @@ describe("ValidatedForm", () => {
     expect(getByLabelText("Email")).toBeInTheDocument();
   });
 
-  it("displays validation error when a field is touched and left empty", async () => {
-    const { getByLabelText, getByText, findByText } = customRender(
-      <ValidatedForm
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={onSubmit}
-        saveButton={
-          <Button buttonType="primary" type="submit">
-            Save
-          </Button>
-        }
-      >
-        <ValidatedTextbox label="Username" name="username" />
-        <ValidatedTextbox label="Email" name="email" />
-      </ValidatedForm>
-    );
+  describe("using validationSchema", () => {
+    beforeEach(() => {
+      customRender(
+        <ValidatedForm
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={onSubmit}
+          saveButton={
+            <Button buttonType="primary" type="submit">
+              Save
+            </Button>
+          }
+        >
+          <ValidatedTextbox label="Username" name="username" />
+          <ValidatedTextbox label="Email" name="email" />
+        </ValidatedForm>
+      );
+    });
 
-    const username = getByLabelText("Username");
-    const saveButton = getByText("Save");
-    user.click(username);
-    user.click(saveButton);
+    it("displays validation error when a field is touched and left empty", async () => {
+      const username = screen.getByLabelText("Username");
+      const saveButton = screen.getByText("Save");
+      user.click(username);
+      user.click(saveButton);
 
-    // Await the appearance of the error message
-    const errorMessage = await findByText("Username is required");
-    expect(errorMessage).toBeInTheDocument();
+      const usernameError = await screen.findByText("Username is required");
+      const emailError = await screen.findByText("Email is required");
+      expect(usernameError).toBeInTheDocument();
+      expect(emailError).toBeInTheDocument();
+    });
   });
 });
