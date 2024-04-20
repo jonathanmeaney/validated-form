@@ -42,14 +42,14 @@ const getValue = ({ target: { value, type, checked } }) =>
   type === "checkbox"
     ? checked
     : value.formattedValue !== undefined
-    ? value.formattedValue
-    : value;
+      ? value.formattedValue
+      : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps
+  fieldProps,
 ) => {
   const { setFieldValue, setFieldTouched, validateField, ...rest } =
     useFormikContext();
@@ -67,7 +67,7 @@ const useFieldHandlers = (
         });
       }
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
   );
 
   return {
@@ -85,10 +85,7 @@ const withFieldValidation = (Component) => {
     return <Component ref={innerRef} {...props} />;
   };
 
-  const ValidatedComponent = ({
-    validate: validateFromInput,
-    ...otherProps
-  }) => {
+  const ValidatedComponent = ({ validate, ...otherProps }) => {
     const fieldProps = { ...otherProps };
     const inputRef = useRef(null);
 
@@ -98,7 +95,9 @@ const withFieldValidation = (Component) => {
       validateOnChange,
       validateOnSubmit,
     } = useValidatedForm();
-    const validate = useFieldValidation(validateFromInput);
+    // Generate the validate function for the Field using the validate passed
+    // into the component directly (if present)
+    const validateField = useFieldValidation(validate);
     const { touched, errors, values } = useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
@@ -123,7 +122,7 @@ const withFieldValidation = (Component) => {
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps
+      fieldProps,
     );
 
     // Checkbox type components need some additional fields set: checked and value
@@ -135,7 +134,7 @@ const withFieldValidation = (Component) => {
       <Field
         {...fieldProps}
         {...checkboxProps}
-        validate={validate}
+        validate={validateField}
         as={ComponentWithRef}
         {...error}
         innerRef={inputRef}

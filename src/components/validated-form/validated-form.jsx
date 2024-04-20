@@ -32,6 +32,7 @@ const ValidatedForm = ({
   validateOnBlur = true,
   validateOnMount = false,
   validateOnSubmit = false,
+  validate,
   onSubmit,
   children,
   withSummary = false,
@@ -51,6 +52,7 @@ const ValidatedForm = ({
       validateOnChange={!validateOnSubmit && validateOnChange}
       validateOnBlur={!validateOnSubmit && validateOnBlur}
       validateOnMount={!validateOnSubmit && validateOnMount}
+      validate={validate}
     >
       {({ handleSubmit, touched, errors }) => {
         const { errorCount, errorMessages } = touchedErrors(touched, errors);
@@ -90,6 +92,7 @@ ValidatedForm.propTypes = {
   validateOnBlur: PropTypes.bool,
   validateOnMount: PropTypes.bool,
   validateOnSubmit: PropTypes.bool,
+  validate: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
   withSummary: PropTypes.bool,

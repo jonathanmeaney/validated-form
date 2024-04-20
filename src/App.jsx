@@ -56,12 +56,23 @@ const App = () => {
     console.log("Submitting", values);
   };
 
-  const validate = (value) => {
+  const validateEmail = (value) => {
     let errorMessage;
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
       errorMessage = "Invalid email address";
     }
     return errorMessage;
+  };
+
+  const validate = (values) => {
+    const errors = {};
+    if (!values.firstName) {
+      errors.firstName = "First Name is required";
+    }
+    if (!values.lastName) {
+      errors.lastName = "Last Name is required";
+    }
+    return errors;
   };
 
   return (
@@ -115,7 +126,7 @@ const App = () => {
           labelInline
           name="email"
           required
-          validate={validate}
+          validate={validateEmail}
         />
         <ValidatedTextarea
           label="Description"
@@ -165,12 +176,41 @@ const App = () => {
         </ValidatedRadioButtonGroup>
       </ValidatedForm>
       <hr />
-      <h1>Validated Form Example - validation schema</h1>
+      <h1>Validated Form Example - Yup validation schema</h1>
       <ValidatedForm
         validationSchema={yup.object({
           firstName: yup.string().required("First Name is required"),
           lastName: yup.string().required("Last Name is required"),
         })}
+        leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
+        saveButton={
+          <Button buttonType="primary" type="submit">
+            Save
+          </Button>
+        }
+        onSubmit={handleSubmit}
+        initialValues={{
+          firstName: "",
+          lastName: "",
+        }}
+      >
+        <ValidatedTextbox
+          label="First Name"
+          labelInline
+          name="firstName"
+          required
+        />
+        <ValidatedTextbox
+          label="Last Name"
+          labelInline
+          name="lastName"
+          required
+        />
+      </ValidatedForm>
+      <hr />
+      <h1>Validated Form Example - validation schema</h1>
+      <ValidatedForm
+        validate={validate}
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
