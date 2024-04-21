@@ -54,11 +54,12 @@ const ValidatedForm = ({
       validateOnMount={!validateOnSubmit && validateOnMount}
       validate={validate}
     >
-      {({ handleSubmit, touched, errors }) => {
+      {({ handleSubmit, touched, errors, submitCount }) => {
+        const canShowValidationSummary = submitCount > 0 && withSummary;
         const { errorCount, errorMessages } = touchedErrors(touched, errors);
         return (
           <>
-            {(withSummary || validateOnSubmit) && (
+            {canShowValidationSummary && (
               <ValidationSummary
                 errorCount={errorCount}
                 errorMessages={errorMessages}

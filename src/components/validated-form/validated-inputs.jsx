@@ -16,15 +16,17 @@ import {
   RadioButton,
   RadioButtonGroup,
 } from "carbon-react/lib/components/radio-button";
-import {
-  Select,
-  Option as ValidatedOption,
-} from "carbon-react/lib/components/select";
+import { Select, Option } from "carbon-react/lib/components/select";
 
 import { useValidatedForm } from "./validated-form-context";
 import useFieldValidation from "./useFieldValidation";
 
+// Get the value from dot notation e.g. 'a.b.c.d'
 const getObjectValue = (obj, path) => {
+  if (!path) {
+    return;
+  }
+
   const parts = path.split(".");
   let current = obj;
 
@@ -42,18 +44,17 @@ const getValue = ({ target: { value, type, checked } }) =>
   type === "checkbox"
     ? checked
     : value.formattedValue !== undefined
-      ? value.formattedValue
-      : value;
+    ? value.formattedValue
+    : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps,
+  fieldProps
 ) => {
-  const { setFieldValue, setFieldTouched, validateField, ...rest } =
-    useFormikContext();
-  // console.log(rest);
+  const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
+
   const handleEvent = useCallback(
     (eventName, canValidate) => (e) => {
       setFieldValue(fieldName, getValue(e));
@@ -67,7 +68,7 @@ const useFieldHandlers = (
         });
       }
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
   );
 
   return {
@@ -79,7 +80,11 @@ const useFieldHandlers = (
 const withFieldValidation = (Component) => {
   const ComponentWithRef = ({ innerRef, ...props }) => {
     if ([RadioButtonGroup, CheckboxGroup].includes(Component)) {
-      return <Component {...props} />;
+      return (
+        <div ref={innerRef}>
+          <Component {...props} />
+        </div>
+      );
     }
 
     return <Component ref={innerRef} {...props} />;
@@ -107,7 +112,9 @@ const withFieldValidation = (Component) => {
     // Register the components inputRef with the context. Used to set focus
     // from the ValidationSummary.
     useEffect(() => {
-      registerInputRef(fieldName, inputRef);
+      if (fieldName) {
+        registerInputRef(fieldName, inputRef);
+      }
     }, [inputRef]);
 
     // Determine if and when you should be able to validate or revalidate a field
@@ -122,7 +129,7 @@ const withFieldValidation = (Component) => {
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps,
+      fieldProps
     );
 
     // Checkbox type components need some additional fields set: checked and value
@@ -155,13 +162,14 @@ const withFieldValidation = (Component) => {
 export const ValidatedTextbox = withFieldValidation(Textbox);
 export const ValidatedTextarea = withFieldValidation(Textarea);
 export const ValidatedCheckbox = withFieldValidation(Checkbox);
-export const ValidatedCheckboxGroup = withFieldValidation(CheckboxGroup);
+// TODO: Add support for CheckboxGroup
+// export const ValidatedCheckboxGroup = withFieldValidation(CheckboxGroup);
 export const ValidatedSwitch = withFieldValidation(Switch);
 export const ValidatedDecimal = withFieldValidation(Decimal);
 export const ValidatedNumber = withFieldValidation(Number);
 export const ValidatedSelect = withFieldValidation(Select);
-export { ValidatedOption };
+export { Option };
 export const ValidatedDateInput = withFieldValidation(DateInput);
 export const ValidatedNumeralDate = withFieldValidation(NumeralDate);
-export const ValidatedRadioButton = withFieldValidation(RadioButton);
+export { RadioButton };
 export const ValidatedRadioButtonGroup = withFieldValidation(RadioButtonGroup);

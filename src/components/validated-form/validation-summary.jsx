@@ -25,13 +25,13 @@ const LinkRow = styled.div`
 const ErrorMessagesList = ({ errorMessages }) => {
   const { inputRefs } = useValidatedForm();
 
-  return Object.entries(errorMessages).map(([key, value]) => {
+  const list = Object.entries(errorMessages).map(([key, value]) => {
     const focus = () => {
       const ref = inputRefs[key]?.current;
 
       if (ref) {
         ref.focus();
-        ref.scrollIntoView({ behavior: "smooth", block: "center" });
+        ref.scrollIntoView({ behavior: "auto", block: "nearest" });
       }
     };
 
@@ -43,6 +43,15 @@ const ErrorMessagesList = ({ errorMessages }) => {
       </LinkRow>
     );
   });
+
+  return (
+    <div
+      data-testid="validation-errors-list"
+      data-role="validation-errors-list"
+    >
+      {list}
+    </div>
+  );
 };
 
 const ValidationSummary = ({ errorCount, errorMessages, summaryTitle }) => {
@@ -56,6 +65,7 @@ const ValidationSummary = ({ errorCount, errorMessages, summaryTitle }) => {
       variant="error"
       open
       mb={5}
+      data-role="validation-summary"
       title={
         <Typography variant="b" mb={2}>
           {title}
@@ -66,7 +76,7 @@ const ValidationSummary = ({ errorCount, errorMessages, summaryTitle }) => {
     </Message>
   );
 
-  return <>{message}</>;
+  return message;
 };
 
 ValidationSummary.propTypes = {

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 
@@ -11,22 +11,27 @@ import Button from "carbon-react/lib/components/button";
 
 import ValidatedForm, { ValidatedTextbox } from "./index.jsx";
 
-const customRender = (ui) => {
-  return render(
-    <CarbonProvider theme={sageTheme} validationRedesignOptIn>
-      {ui}
-    </CarbonProvider>
-  );
+const customRender = async (ui) => {
+  await act(async () => {
+    render(
+      <CarbonProvider theme={sageTheme} validationRedesignOptIn>
+        {ui}
+      </CarbonProvider>
+    );
+  });
 };
 
 describe("ValidatedForm", () => {
   const user = userEvent.setup();
+
+  const validateUsername = Yup.string().required("Username is required");
+  const validateEmail = Yup.string()
+    .email("Enter a valid email")
+    .required("Email is required");
   // Sample validation schema using Yup
   const validationSchema = Yup.object({
-    username: Yup.string().required("Username is required"),
-    email: Yup.string()
-      .email("Enter a valid email")
-      .required("Email is required"),
+    username: validateUsername,
+    email: validateEmail,
   });
 
   const initialValues = {
@@ -37,7 +42,7 @@ describe("ValidatedForm", () => {
   const onSubmit = jest.fn();
 
   it("renders the form with all fields", () => {
-    const { getByLabelText } = customRender(
+    customRender(
       <ValidatedForm
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -53,39 +58,87 @@ describe("ValidatedForm", () => {
       </ValidatedForm>
     );
 
-    expect(getByLabelText("Username")).toBeInTheDocument();
-    expect(getByLabelText("Email")).toBeInTheDocument();
+    expect(screen.getByLabelText("Username")).toBeInTheDocument();
+    expect(screen.getByLabelText("Email")).toBeInTheDocument();
   });
 
-  describe("using validationSchema", () => {
-    beforeEach(() => {
-      customRender(
-        <ValidatedForm
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={onSubmit}
-          saveButton={
-            <Button buttonType="primary" type="submit">
-              Save
-            </Button>
-          }
-        >
-          <ValidatedTextbox label="Username" name="username" />
-          <ValidatedTextbox label="Email" name="email" />
-        </ValidatedForm>
-      );
+  describe("when using Yup validations", () => {
+    describe("and per input validation", () => {
+      describe.only("onBlur", () => {
+        beforeEach(async () => {
+          await customRender(
+            <ValidatedForm
+              initialValues={initialValues}
+              onSubmit={onSubmit}
+              saveButton={
+                <Button buttonType="primary" type="submit">
+                  Save
+                </Button>
+              }
+            >
+              <ValidatedTextbox
+                label="Username"
+                name="username"
+                validate={validateUsername}
+              />
+              <ValidatedTextbox
+                label="Email"
+                name="email"
+                validate={validateEmail}
+              />
+            </ValidatedForm>
+          );
+        });
+
+        it("displays validation error when a field is touched and left empty", async () => {
+          expect(screen.queryByText("Username is required")).toBeNull();
+          expect(screen.queryByText("Email is required")).toBeNull();
+          expect(screen.queryByText("2 errors")).toBeNull();
+
+          // Blur each field
+          const username = screen.getByLabelText("Username");
+          const email = screen.getByLabelText("Email");
+          await user.click(username);
+          await user.click(email);
+          await user.click(username);
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+          expect(screen.getByText("Email is required")).toBeInTheDocument();
+          expect(screen.getByText("2 errors")).toBeInTheDocument();
+        });
+      });
     });
 
-    it("displays validation error when a field is touched and left empty", async () => {
-      const username = screen.getByLabelText("Username");
-      const saveButton = screen.getByText("Save");
-      user.click(username);
-      user.click(saveButton);
+    describe("and validationSchema", () => {
+      beforeEach(() => {
+        customRender(
+          <ValidatedForm
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={onSubmit}
+            saveButton={
+              <Button buttonType="primary" type="submit">
+                Save
+              </Button>
+            }
+          >
+            <ValidatedTextbox label="Username" name="username" />
+            <ValidatedTextbox label="Email" name="email" />
+          </ValidatedForm>
+        );
+      });
 
-      const usernameError = await screen.findByText("Username is required");
-      const emailError = await screen.findByText("Email is required");
-      expect(usernameError).toBeInTheDocument();
-      expect(emailError).toBeInTheDocument();
+      it("displays validation error when a field is touched and left empty", async () => {
+        const username = screen.getByLabelText("Username");
+        const saveButton = screen.getByText("Save");
+        user.click(username);
+        user.click(saveButton);
+
+        const usernameError = await screen.findByText("Username is required");
+        const emailError = await screen.findByText("Email is required");
+        expect(usernameError).toBeInTheDocument();
+        expect(emailError).toBeInTheDocument();
+      });
     });
   });
 });

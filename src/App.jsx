@@ -10,7 +10,9 @@ import ValidatedForm, {
   ValidatedDateInput,
   ValidatedSwitch,
   ValidatedRadioButtonGroup,
-  ValidatedRadioButton,
+  RadioButton,
+  ValidatedSelect,
+  Option,
 } from "./components/validated-form";
 
 import "./styles.scss";
@@ -80,6 +82,7 @@ const App = () => {
       <h1>Validated Form Example - validation per input</h1>
       <ValidatedForm
         validateOnSubmit
+        withSummary
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
@@ -94,7 +97,11 @@ const App = () => {
           description: "",
           agreeTerms: false,
           enableSpyware: false,
+          color: "",
           accountType: "",
+          pizzaToppingsPheasant: "",
+          pizzaToppingsPineapple: "",
+          pizzaToppingsAnchovies: "",
           personalDetails: {
             dob: "",
             addressLineOne: "",
@@ -139,7 +146,6 @@ const App = () => {
           label="Agree to terms?"
           labelInline
           name="agreeTerms"
-          checked={false}
           required
           validate={yup
             .boolean()
@@ -153,27 +159,40 @@ const App = () => {
           required
           validate={yup.boolean().oneOf([true], "You must enable spyware")}
         />
+
         <ValidatedRadioButtonGroup
           legend="Account Type"
           name="accountType"
           validate={yup.string().required("Account Type is required")}
         >
-          <ValidatedRadioButton
+          <RadioButton
             id="radio-one-1"
             value="super-manager"
             label="Super Manager"
           />
-          <ValidatedRadioButton
-            id="radio-one-2"
-            value="manager"
-            label="Manager"
-          />
-          <ValidatedRadioButton
-            id="radio-one-3"
-            value="employee"
-            label="Employee"
-          />
+          <RadioButton id="radio-one-2" value="manager" label="Manager" />
+          <RadioButton id="radio-one-3" value="employee" label="Employee" />
         </ValidatedRadioButtonGroup>
+        <ValidatedSelect
+          name="color"
+          id="color"
+          label="Color"
+          labelInline
+          required
+          validate={yup.string().required("Color is required")}
+        >
+          <Option text="Amber" value="1" />
+          <Option text="Black" value="2" />
+          <Option text="Blue" value="3" />
+          <Option text="Brown" value="4" />
+          <Option text="Green" value="5" />
+          <Option text="Orange" value="6" />
+          <Option text="Pink" value="7" />
+          <Option text="Purple" value="8" />
+          <Option text="Red" value="9" />
+          <Option text="White" value="10" />
+          <Option text="Yellow" value="11" />
+        </ValidatedSelect>
       </ValidatedForm>
       <hr />
       <h1>Validated Form Example - Yup validation schema</h1>

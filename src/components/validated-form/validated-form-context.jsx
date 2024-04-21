@@ -76,8 +76,6 @@ const ContextProvider = ({
     });
   }, []);
 
-  console.log(state);
-
   // use useMemo for context value to prevent
   // needless rerenders.
   const value = useMemo(() => {
