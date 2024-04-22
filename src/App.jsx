@@ -94,7 +94,7 @@ const App = () => {
 
   return (
     <div className="app">
-      {/* <h1>Validated Form Example - validation per input</h1>
+      <h1>Validated Form Example - validation per input</h1>
       <ValidatedForm
         // validateOnSubmit
         validateOnMount
@@ -165,7 +165,7 @@ const App = () => {
           required
           validate={Yup.boolean().oneOf(
             [true],
-            "You must Accept Terms and Conditions",
+            "You must Accept Terms and Conditions"
           )}
         />
         <ValidatedSwitch
@@ -211,7 +211,7 @@ const App = () => {
           <Option text="Yellow" value="11" />
         </ValidatedSelect>
       </ValidatedForm>
-      <hr /> */}
+      <hr />
       <h1>
         Validated Form Example - validation per input with optional fields
       </h1>
@@ -259,7 +259,7 @@ const App = () => {
           />
         )}
       </ValidatedForm>
-      {/* <hr />
+      <hr />
       <h1>Validated Form Example - Yup validation schema</h1>
       <ValidatedForm
         validationSchema={Yup.object({
@@ -319,7 +319,7 @@ const App = () => {
           name="lastName"
           required
         />
-      </ValidatedForm> */}
+      </ValidatedForm>
     </div>
   );
 };

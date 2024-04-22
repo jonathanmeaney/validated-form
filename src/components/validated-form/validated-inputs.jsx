@@ -40,26 +40,6 @@ const getObjectValue = (obj, path) => {
   return current;
 };
 
-const setObjectValue = (obj, path, value) => {
-  if (!path) {
-    return undefined;
-  }
-
-  const parts = path.split(".");
-  let current = obj;
-
-  for (let i = 0; i < parts.length - 1; i++) {
-    const part = parts[i];
-    if (current[part] === undefined) {
-      current[part] = {};
-    }
-    current = current[part];
-  }
-
-  // Set the value to the last part of the path
-  current[parts[parts.length - 1]] = value;
-};
-
 const removeObjectField = (obj, path) => {
   if (!path) {
     return obj;
@@ -108,23 +88,18 @@ const hasKey = (obj, path) => {
   return true;
 };
 
-const omit = (obj, keyToOmit) => {
-  const { [keyToOmit]: _, ...rest } = obj;
-  return rest;
-};
-
 const getValue = ({ target: { value, type, checked } }) =>
   type === "checkbox"
     ? checked
     : value.formattedValue !== undefined
-      ? value.formattedValue
-      : value;
+    ? value.formattedValue
+    : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps,
+  fieldProps
 ) => {
   const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
 
@@ -146,7 +121,7 @@ const useFieldHandlers = (
         setFieldTouched,
       });
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
   );
 
   return {
@@ -189,9 +164,6 @@ const withFieldValidation = (Component) => {
       setFieldValue,
       setFieldTouched,
       setValues,
-      setErrors,
-      setTouched,
-      validateField,
     } = useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
@@ -204,33 +176,16 @@ const withFieldValidation = (Component) => {
     useEffect(() => {
       if (fieldName) {
         registerInputRef(fieldName, inputRef);
+        if (!hasKey(values, fieldName)) setFieldValue(fieldName, fieldValue);
       }
 
       // When unmounting deregister
       return () => {
         deregisterInputRef(fieldName);
+        setValues((prev) => removeObjectField(prev, fieldName));
+        setFieldTouched(fieldName, false);
       };
     }, [inputRef]);
-
-    useEffect(() => {
-      console.log("useeffect umounting");
-      console.log({ values, touched, errors });
-      if (!hasKey(values, fieldName)) setFieldValue(fieldName, fieldValue);
-
-      // When unmounting deregister
-      return () => {
-        console.log("useeffect unmounting");
-        console.log({ values, touched, errors });
-        const updatedValues = removeObjectField(values, fieldName);
-        setValues(updatedValues);
-
-        const updatedErrors = removeObjectField(errors, fieldName);
-        setErrors(updatedErrors);
-
-        const updatedTouched = removeObjectField(touched, fieldName);
-        setObjectValue(updatedTouched);
-      };
-    }, []);
 
     // Determine if and when you should be able to validate or revalidate a field
     const canValidateOnBlur =
@@ -244,7 +199,7 @@ const withFieldValidation = (Component) => {
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps,
+      fieldProps
     );
 
     // Checkbox type components need some additional fields set: checked and value

@@ -80,7 +80,7 @@ const ContextProvider = ({
 
   const [state, dispatch] = useReducer(
     validatedFormReducer,
-    updatedInitialState,
+    updatedInitialState
   );
 
   const registerInputRef = useCallback((name, inputRef) => {
@@ -97,7 +97,6 @@ const ContextProvider = ({
     });
   }, []);
 
-  console.log({ state });
   // use useMemo for context value to prevent
   // needless rerenders.
   const value = useMemo(() => {
