@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef, memo } from "react";
 import PropTypes from "prop-types";
-import { isEqual, isEmpty } from "lodash";
+import { isEqual, isEmpty, cloneDeep } from "lodash";
 
 import { Field, useFormikContext } from "formik";
 
@@ -21,10 +21,10 @@ import { Select, Option } from "carbon-react/lib/components/select";
 import { useValidatedForm } from "./validated-form-context";
 import useFieldValidation from "./useFieldValidation";
 
-// Get the value from dot notation e.g. 'a.b.c.d'
+// Get the value from the object using dot notation e.g. 'a.b.c.d'
 const getObjectValue = (obj, path) => {
   if (!path) {
-    return;
+    return undefined;
   }
 
   const parts = path.split(".");
@@ -40,35 +40,113 @@ const getObjectValue = (obj, path) => {
   return current;
 };
 
+const setObjectValue = (obj, path, value) => {
+  if (!path) {
+    return undefined;
+  }
+
+  const parts = path.split(".");
+  let current = obj;
+
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    if (current[part] === undefined) {
+      current[part] = {};
+    }
+    current = current[part];
+  }
+
+  // Set the value to the last part of the path
+  current[parts[parts.length - 1]] = value;
+};
+
+const removeObjectField = (obj, path) => {
+  if (!path) {
+    return obj;
+  }
+
+  const parts = path.split(".");
+  const newObj = cloneDeep(obj);
+  let current = newObj;
+
+  // Navigate to the second to last part of the path
+  for (let i = 0; i < parts.length - 1; i++) {
+    let part = parts[i];
+    if (current[part] === undefined) {
+      return obj; // Return the original object if the path is invalid
+    }
+    // Make a shallow copy at each level
+    current[part] = { ...current[part] };
+    current = current[part];
+  }
+
+  // Delete the last part of the path if it exists
+  const lastPart = parts[parts.length - 1];
+  if (current[lastPart] !== undefined) {
+    delete current[lastPart];
+  }
+
+  return newObj;
+};
+
+// Check if the path is present in the object
+const hasKey = (obj, path) => {
+  if (!path) {
+    return false;
+  }
+
+  const parts = path.split(".");
+  let current = obj;
+
+  for (let part of parts) {
+    if (current[part] === undefined) {
+      return false;
+    }
+    current = current[part];
+  }
+
+  return true;
+};
+
+const omit = (obj, keyToOmit) => {
+  const { [keyToOmit]: _, ...rest } = obj;
+  return rest;
+};
+
 const getValue = ({ target: { value, type, checked } }) =>
   type === "checkbox"
     ? checked
     : value.formattedValue !== undefined
-    ? value.formattedValue
-    : value;
+      ? value.formattedValue
+      : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps
+  fieldProps,
 ) => {
   const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
 
   const handleEvent = useCallback(
     (eventName, canValidate) => (e) => {
       setFieldValue(fieldName, getValue(e));
-      setFieldTouched(fieldName, true);
+
+      if (eventName === "onBlur") {
+        setFieldTouched(fieldName, true);
+      }
+
       if (canValidate) {
         validateField(fieldName);
-        fieldProps[eventName]?.(e, {
-          validateField,
-          setFieldValue,
-          setFieldTouched,
-        });
       }
+
+      fieldProps[eventName]?.(e, {
+        validateField,
+        setFieldValue,
+        setFieldTouched,
+      });
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
   );
 
   return {
@@ -96,17 +174,29 @@ const withFieldValidation = (Component) => {
 
     const {
       registerInputRef,
+      deregisterInputRef,
       validateOnBlur,
       validateOnChange,
       validateOnSubmit,
     } = useValidatedForm();
     // Generate the validate function for the Field using the validate passed
     // into the component directly (if present)
-    const validateField = useFieldValidation(validate);
-    const { touched, errors, values } = useFormikContext();
+    const validateCallback = useFieldValidation(validate);
+    const {
+      touched,
+      errors,
+      values,
+      setFieldValue,
+      setFieldTouched,
+      setValues,
+      setErrors,
+      setTouched,
+      validateField,
+    } = useFormikContext();
     const fieldName = fieldProps.name;
     const fieldTouched = getObjectValue(touched, fieldName);
     const fieldError = getObjectValue(errors, fieldName);
+    const fieldValue = getObjectValue(values, fieldName) || "";
     const error = fieldTouched && fieldError ? { error: fieldError } : {};
 
     // Register the components inputRef with the context. Used to set focus
@@ -115,7 +205,32 @@ const withFieldValidation = (Component) => {
       if (fieldName) {
         registerInputRef(fieldName, inputRef);
       }
+
+      // When unmounting deregister
+      return () => {
+        deregisterInputRef(fieldName);
+      };
     }, [inputRef]);
+
+    useEffect(() => {
+      console.log("useeffect umounting");
+      console.log({ values, touched, errors });
+      if (!hasKey(values, fieldName)) setFieldValue(fieldName, fieldValue);
+
+      // When unmounting deregister
+      return () => {
+        console.log("useeffect unmounting");
+        console.log({ values, touched, errors });
+        const updatedValues = removeObjectField(values, fieldName);
+        setValues(updatedValues);
+
+        const updatedErrors = removeObjectField(errors, fieldName);
+        setErrors(updatedErrors);
+
+        const updatedTouched = removeObjectField(touched, fieldName);
+        setObjectValue(updatedTouched);
+      };
+    }, []);
 
     // Determine if and when you should be able to validate or revalidate a field
     const canValidateOnBlur =
@@ -129,7 +244,7 @@ const withFieldValidation = (Component) => {
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps
+      fieldProps,
     );
 
     // Checkbox type components need some additional fields set: checked and value
@@ -139,14 +254,15 @@ const withFieldValidation = (Component) => {
 
     return (
       <Field
-        {...fieldProps}
-        {...checkboxProps}
-        validate={validateField}
+        validate={validateCallback}
         as={ComponentWithRef}
-        {...error}
         innerRef={inputRef}
+        value={fieldValue}
         onChange={onChange}
         onBlur={onBlur}
+        {...fieldProps}
+        {...checkboxProps}
+        {...error}
       />
     );
   };

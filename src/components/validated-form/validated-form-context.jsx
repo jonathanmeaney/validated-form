@@ -5,7 +5,6 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { isEqual } from "lodash";
 import PropTypes from "prop-types";
 
 const initialState = {
@@ -18,6 +17,7 @@ const initialState = {
 
 export const actions = {
   REGISTER_INPUT_REF: "REGISTER_INPUT_REF",
+  DEREGISTER_INPUT_REF: "DEREGISTER_INPUT_REF",
 };
 
 const validatedFormReducer = (state, action) => {
@@ -34,6 +34,19 @@ const validatedFormReducer = (state, action) => {
         inputRefs,
       };
     }
+    case actions.DEREGISTER_INPUT_REF: {
+      const { name } = action.payload;
+      const inputRefs = {
+        ...state.inputRefs,
+      };
+
+      delete inputRefs[name];
+
+      return {
+        ...state,
+        inputRefs,
+      };
+    }
     default:
       return { ...state };
   }
@@ -42,6 +55,7 @@ const validatedFormReducer = (state, action) => {
 const ValidatedFormContext = createContext({
   ...initialState,
   registerInputRef: () => {},
+  deregisterInputRef: () => {},
 });
 
 // Custom hook to access validatedForm context value
@@ -66,7 +80,7 @@ const ContextProvider = ({
 
   const [state, dispatch] = useReducer(
     validatedFormReducer,
-    updatedInitialState
+    updatedInitialState,
   );
 
   const registerInputRef = useCallback((name, inputRef) => {
@@ -76,12 +90,21 @@ const ContextProvider = ({
     });
   }, []);
 
+  const deregisterInputRef = useCallback((name) => {
+    dispatch({
+      type: actions.DEREGISTER_INPUT_REF,
+      payload: { name },
+    });
+  }, []);
+
+  console.log({ state });
   // use useMemo for context value to prevent
   // needless rerenders.
   const value = useMemo(() => {
     return {
       ...state,
       registerInputRef,
+      deregisterInputRef,
     };
   }, [state, registerInputRef]);
 
@@ -112,13 +135,7 @@ ContextProvider.defaultProps = {
   validateOnSubmit: false,
 };
 
-// Use React.memo to prevent rerenders when unnecessary.
-// Unnecessary rerenders can cause the state to reset to default.
-/* istanbul ignore next */
-const areEqual = (props, nextProps) => {
-  return isEqual(props.initialState, nextProps.initialState);
-};
-const ValidatedFormContextProvider = React.memo(ContextProvider, areEqual);
+const ValidatedFormContextProvider = ContextProvider;
 
 ValidatedFormContext.displayName = "ValidatedFormContext";
 

@@ -1,4 +1,5 @@
-import React, { memo } from "react";
+/* eslint-disable react/jsx-props-no-spreading */
+import React, { cloneElement } from "react";
 import PropTypes from "prop-types";
 import { Formik } from "formik";
 
@@ -8,20 +9,8 @@ import { touchedErrors } from "./utils";
 import ValidationSummary from "./validation-summary";
 import { ValidatedFormContextProvider } from "./validated-form-context";
 
-const withContext = (Component) =>
-  memo((props) => (
-    <ValidatedFormContextProvider
-      validateOnMount={props.validateOnMount}
-      validateOnBlur={props.validateOnBlur || true}
-      validateOnChange={props.validateOnChange}
-      validateOnSubmit={props.validateOnSubmit}
-    >
-      <Component {...props} />
-    </ValidatedFormContextProvider>
-  ));
-
 const CustomSaveButton = ({ onClick, saveButton }) =>
-  React.cloneElement(saveButton, {
+  cloneElement(saveButton, {
     onClick: () => onClick && onClick(),
   });
 
@@ -29,7 +18,7 @@ const ValidatedForm = ({
   initialValues,
   validationSchema,
   validateOnChange = false,
-  validateOnBlur = true,
+  validateOnBlur = false,
   validateOnMount = false,
   validateOnSubmit = false,
   validate,
@@ -40,49 +29,63 @@ const ValidatedForm = ({
   saveButton,
   ...formProps
 }) => {
+  const key = JSON.stringify(initialValues);
   return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={async (values, { validateForm }) => {
-        // Validate the form one last time
-        const isValid = await validateForm();
-        if (isValid) onSubmit(values);
-      }}
-      validationSchema={validationSchema}
-      validateOnChange={!validateOnSubmit && validateOnChange}
-      validateOnBlur={!validateOnSubmit && validateOnBlur}
-      validateOnMount={!validateOnSubmit && validateOnMount}
-      validate={validate}
+    <ValidatedFormContextProvider
+      validateOnMount={validateOnMount}
+      validateOnBlur={validateOnBlur}
+      validateOnChange={validateOnChange}
+      validateOnSubmit={validateOnSubmit}
     >
-      {({ handleSubmit, touched, errors, submitCount }) => {
-        const canShowValidationSummary = submitCount > 0 && withSummary;
-        const { errorCount, errorMessages } = touchedErrors(touched, errors);
-        return (
-          <>
-            {canShowValidationSummary && (
-              <ValidationSummary
-                errorCount={errorCount}
-                errorMessages={errorMessages}
-                summaryTitle={summaryTitle}
-              />
-            )}
-            <Form
-              {...formProps}
-              saveButton={
-                <CustomSaveButton
-                  onClick={saveButton?.onClick}
-                  saveButton={saveButton}
+      <Formik
+        // This prop will cause the fields to update if the initialValues change.
+        // enableReinitialize
+        // Add key to ensure rerendering if initialValues changes
+        // key={key}
+        initialValues={initialValues}
+        onSubmit={async (values, { validateForm }) => {
+          // Validate the form one last time
+          const isValid = await validateForm();
+          if (isValid) onSubmit(values);
+        }}
+        validationSchema={validationSchema}
+        validateOnChange={!validateOnSubmit && validateOnChange}
+        validateOnBlur={!validateOnSubmit && validateOnBlur}
+        validateOnMount={!validateOnSubmit && validateOnMount}
+        validate={validate}
+      >
+        {({ handleSubmit, touched, errors, values, submitCount }) => {
+          console.log("rendering");
+          console.log({ touched, errors, values });
+          const canShowValidationSummary = submitCount > 0 && withSummary;
+          const { errorCount, errorMessages } = touchedErrors(touched, errors);
+          return (
+            <>
+              {canShowValidationSummary && (
+                <ValidationSummary
+                  errorCount={errorCount}
+                  errorMessages={errorMessages}
+                  summaryTitle={summaryTitle}
                 />
-              }
-              onSubmit={handleSubmit}
-              errorCount={errorCount}
-            >
-              {children}
-            </Form>
-          </>
-        );
-      }}
-    </Formik>
+              )}
+              <Form
+                {...formProps}
+                saveButton={
+                  <CustomSaveButton
+                    onClick={saveButton?.onClick}
+                    saveButton={saveButton}
+                  />
+                }
+                onSubmit={handleSubmit}
+                errorCount={errorCount}
+              >
+                {children}
+              </Form>
+            </>
+          );
+        }}
+      </Formik>
+    </ValidatedFormContextProvider>
   );
 };
 
@@ -96,10 +99,11 @@ ValidatedForm.propTypes = {
   validate: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
+  saveButton: PropTypes.node,
   withSummary: PropTypes.bool,
   summaryTitle: PropTypes.string,
 };
 
 ValidatedForm.displayName = "ValidatedForm";
 
-export default withContext(ValidatedForm);
+export default ValidatedForm;

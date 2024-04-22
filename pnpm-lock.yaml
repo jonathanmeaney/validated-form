@@ -42,8 +42,8 @@ dependencies:
     specifier: ^4.4.1
     version: 4.4.1(@babel/core@7.23.9)(react-dom@17.0.2)(react@17.0.2)
   yup:
-    specifier: 1.3.3
-    version: 1.3.3
+    specifier: ^0.32.11
+    version: 0.32.11
 
 devDependencies:
   '@babel/preset-env':
@@ -2578,6 +2578,10 @@ packages:
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
+
+  /@types/lodash@4.17.0:
+    resolution: {integrity: sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA==}
+    dev: false
 
   /@types/minimist@1.2.5:
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
@@ -6119,6 +6123,10 @@ packages:
     requiresBuild: true
     dev: false
 
+  /nanoclone@0.2.1:
+    resolution: {integrity: sha512-wynEP02LmIbLpcYw8uBKpcfF6dmg2vcpKqxeH5UcoKEYdExslsdUA4ugFauuaeYdTB76ez6gJW8XAZ6CgkXYxA==}
+    dev: false
+
   /nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
@@ -7392,10 +7400,6 @@ packages:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
     dev: true
 
-  /tiny-case@1.0.3:
-    resolution: {integrity: sha512-Eet/eeMhkO6TX8mnUteS9zgPbUMQa4I6Kkp5ORiBD5476/m+PIRiumP5tmh5ioJpH7k51Kehawy2UDfsnxxY8Q==}
-    dev: false
-
   /tiny-warning@1.0.3:
     resolution: {integrity: sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==}
     dev: false
@@ -7496,11 +7500,6 @@ packages:
   /type-fest@0.8.1:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
-    dev: false
-
-  /type-fest@2.19.0:
-    resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
-    engines: {node: '>=12.20'}
     dev: false
 
   /typed-array-buffer@1.0.2:
@@ -7915,13 +7914,17 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /yup@1.3.3:
-    resolution: {integrity: sha512-v8QwZSsHH2K3/G9WSkp6mZKO+hugKT1EmnMqLNUcfu51HU9MDyhlETT/JgtzprnrnQHPWsjc6MUDMBp/l9fNnw==}
+  /yup@0.32.11:
+    resolution: {integrity: sha512-Z2Fe1bn+eLstG8DRR6FTavGD+MeAwyfmouhHsIUgaADz8jvFKbO/fXc2trJKZg+5EBjh4gGm3iU/t3onKlXHIg==}
+    engines: {node: '>=10'}
     dependencies:
+      '@babel/runtime': 7.24.0
+      '@types/lodash': 4.17.0
+      lodash: 4.17.21
+      lodash-es: 4.17.21
+      nanoclone: 0.2.1
       property-expr: 2.0.6
-      tiny-case: 1.0.3
       toposort: 2.0.2
-      type-fest: 2.19.0
     dev: false
 
   '@github.com/fnando/i18n-js/archive/v3.0.0.rc12.tar.gz':

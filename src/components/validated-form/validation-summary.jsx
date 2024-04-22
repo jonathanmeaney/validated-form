@@ -31,7 +31,7 @@ const ErrorMessagesList = ({ errorMessages }) => {
 
       if (ref) {
         ref.focus();
-        ref.scrollIntoView({ behavior: "auto", block: "nearest" });
+        ref.scrollIntoView({ behavior: "auto", block: "center" });
       }
     };
 
