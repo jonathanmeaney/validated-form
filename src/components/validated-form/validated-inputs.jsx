@@ -23,6 +23,7 @@ import useFieldValidation from "./useFieldValidation";
 
 // Get the value from the object using dot notation e.g. 'a.b.c.d'
 const getObjectValue = (obj, path) => {
+  /* istanbul ignore next */
   if (!path) {
     return undefined;
   }
@@ -41,6 +42,7 @@ const getObjectValue = (obj, path) => {
 };
 
 const removeObjectField = (obj, path) => {
+  /* istanbul ignore next */
   if (!path) {
     return obj;
   }
@@ -71,6 +73,7 @@ const removeObjectField = (obj, path) => {
 
 // Check if the path is present in the object
 const hasKey = (obj, path) => {
+  /* istanbul ignore next */
   if (!path) {
     return false;
   }

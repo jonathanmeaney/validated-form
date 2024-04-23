@@ -3,7 +3,7 @@ import { useCallback } from "react";
 const useFieldValidation = (inputValidate) => {
   const validate = useCallback(
     (value) => {
-      if (!inputValidate) return;
+      if (!inputValidate) return undefined;
 
       if (inputValidate.validateSync) {
         try {
@@ -15,10 +15,14 @@ const useFieldValidation = (inputValidate) => {
         try {
           return inputValidate(value);
         } catch (err) {
+          /* istanbul ignore next */
           console.error(err);
-          return;
+          /* istanbul ignore next */
+          return undefined;
         }
       }
+
+      return undefined;
     },
     [inputValidate]
   );

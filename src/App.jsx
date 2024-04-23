@@ -262,6 +262,7 @@ const App = () => {
       <hr />
       <h1>Validated Form Example - Yup validation schema</h1>
       <ValidatedForm
+        validateOnBlur
         validationSchema={Yup.object({
           firstName: Yup.string().required("First Name is required"),
           lastName: Yup.string().required("Last Name is required"),
