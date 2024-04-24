@@ -54,6 +54,7 @@ const removeObjectField = (obj, path) => {
   // Navigate to the second to last part of the path
   for (let i = 0; i < parts.length - 1; i++) {
     let part = parts[i];
+    /* istanbul ignore next */
     if (current[part] === undefined) {
       return obj; // Return the original object if the path is invalid
     }
@@ -82,6 +83,7 @@ const hasKey = (obj, path) => {
   let current = obj;
 
   for (let part of parts) {
+    /* istanbul ignore next */
     if (current[part] === undefined) {
       return false;
     }

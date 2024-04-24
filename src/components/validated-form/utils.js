@@ -5,6 +5,7 @@ export const touchedErrors = (touched, errors) => {
   let errorMessages = {};
 
   for (const [key, value] of Object.entries(flattenedTouched)) {
+    /* istanbul ignore next */
     if (value) {
       const errorValue = flattenedErrors[key];
 

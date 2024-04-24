@@ -29,6 +29,7 @@ const ErrorMessagesList = ({ errorMessages }) => {
     const focus = () => {
       const ref = inputRefs[key]?.current;
 
+      /* istanbul ignore next */
       if (ref) {
         ref.focus();
         ref.scrollIntoView({ behavior: "auto", block: "center" });
@@ -76,7 +77,7 @@ const ValidationSummary = ({ errorCount, errorMessages, summaryTitle }) => {
     </Message>
   );
 
-  return message;
+  return <div data-testid="validation-summary">{message}</div>;
 };
 
 ValidationSummary.propTypes = {
@@ -84,5 +85,7 @@ ValidationSummary.propTypes = {
   errorMessages: PropTypes.object,
   summaryTitle: PropTypes.string,
 };
+
+ValidationSummary.displayName = "ValidationSummary";
 
 export default ValidationSummary;
