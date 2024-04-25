@@ -97,14 +97,14 @@ const getValue = ({ target: { value, type, checked } }) =>
   type === "checkbox"
     ? checked
     : value.formattedValue !== undefined
-    ? value.formattedValue
-    : value;
+      ? value.formattedValue
+      : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps
+  fieldProps,
 ) => {
   const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
 
@@ -126,7 +126,7 @@ const useFieldHandlers = (
         setFieldTouched,
       });
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
   );
 
   return {
@@ -137,7 +137,7 @@ const useFieldHandlers = (
 
 const withFieldValidation = (Component) => {
   const ComponentWithRef = ({ innerRef, ...props }) => {
-    if ([RadioButtonGroup, CheckboxGroup].includes(Component)) {
+    if (["RadioButtonGroup", "CheckboxGroup"].includes(Component.displayName)) {
       return (
         <div ref={innerRef}>
           <Component {...props} />
@@ -204,11 +204,11 @@ const withFieldValidation = (Component) => {
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps
+      fieldProps,
     );
 
     // Checkbox type components need some additional fields set: checked and value
-    const checkboxProps = [Checkbox, Switch].includes(Component)
+    const checkboxProps = ["Checkbox", "Switch"].includes(Component.displayName)
       ? { checked: values[fieldName], value: String(values[fieldName]) }
       : {};
 
