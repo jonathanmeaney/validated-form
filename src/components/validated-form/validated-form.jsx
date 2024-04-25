@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { cloneElement } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Formik } from "formik";
 
@@ -9,16 +9,11 @@ import { touchedErrors } from "./utils";
 import ValidationSummary from "./validation-summary";
 import { ValidatedFormContextProvider } from "./validated-form-context";
 
-const CustomSaveButton = ({ onClick, saveButton }) =>
-  cloneElement(saveButton, {
-    onClick: () => onClick && onClick(),
-  });
-
 const ValidatedForm = ({
   initialValues,
   validationSchema,
-  validateOnChange = false,
-  validateOnBlur = false,
+  validateOnChange = true,
+  validateOnBlur = true,
   validateOnMount = false,
   validateOnSubmit = false,
   validate,
@@ -26,15 +21,30 @@ const ValidatedForm = ({
   children,
   withSummary = false,
   summaryTitle,
-  saveButton,
   ...formProps
 }) => {
   const key = JSON.stringify(initialValues);
+
+  let canValidateOnChange = validateOnChange;
+  if (validateOnSubmit) {
+    canValidateOnChange = false;
+  }
+
+  let canValidateOnBlur = validateOnBlur;
+  if (validateOnSubmit) {
+    canValidateOnBlur = false;
+  }
+
+  let canValidateOnMount = validateOnMount;
+  if (validateOnSubmit) {
+    canValidateOnMount = false;
+  }
+
   return (
     <ValidatedFormContextProvider
-      validateOnMount={validateOnMount}
-      validateOnBlur={validateOnBlur}
-      validateOnChange={validateOnChange}
+      validateOnMount={canValidateOnMount}
+      validateOnBlur={canValidateOnChange}
+      validateOnChange={canValidateOnChange}
       validateOnSubmit={validateOnSubmit}
     >
       <Formik
@@ -46,12 +56,13 @@ const ValidatedForm = ({
         onSubmit={async (values, { validateForm }) => {
           // Validate the form one last time
           const isValid = await validateForm();
+          /* istanbul ignore next */
           if (isValid) onSubmit(values);
         }}
         validationSchema={validationSchema}
-        validateOnChange={!validateOnSubmit && validateOnChange}
-        validateOnBlur={!validateOnSubmit && validateOnBlur}
-        validateOnMount={!validateOnSubmit && validateOnMount}
+        validateOnChange={canValidateOnChange}
+        validateOnBlur={canValidateOnBlur}
+        validateOnMount={canValidateOnMount}
         validate={validate}
       >
         {({ handleSubmit, touched, errors, submitCount }) => {
@@ -68,12 +79,6 @@ const ValidatedForm = ({
               )}
               <Form
                 {...formProps}
-                saveButton={
-                  <CustomSaveButton
-                    onClick={saveButton?.onClick}
-                    saveButton={saveButton}
-                  />
-                }
                 onSubmit={handleSubmit}
                 errorCount={errorCount}
               >

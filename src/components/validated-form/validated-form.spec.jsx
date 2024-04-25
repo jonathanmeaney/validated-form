@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { render, screen, act, within } from "@testing-library/react";
 
 import userEvent from "@testing-library/user-event";
@@ -8,6 +8,7 @@ import CarbonProvider from "carbon-react/lib/components/carbon-provider";
 import sageTheme from "carbon-react/lib/style/themes/sage";
 
 import Button from "carbon-react/lib/components/button";
+import Switch from "carbon-react/lib/components/switch";
 
 import ValidatedForm, {
   ValidatedTextbox,
@@ -23,6 +24,66 @@ const customRender = async (ui) => {
     <CarbonProvider theme={sageTheme} validationRedesignOptIn>
       {ui}
     </CarbonProvider>
+  );
+};
+
+const DynamicExample = ({ onSubmit }) => {
+  const [includePhone, setIncludePhone] = useState(false);
+
+  const handleSwitch = (e) => {
+    setIncludePhone(e.target.checked);
+  };
+
+  const initialValues = () => {
+    if (includePhone) {
+      return { username: "", email: "", phone: "" };
+    }
+
+    return { username: "", email: "" };
+  };
+
+  return (
+    <ValidatedForm
+      validateOnBlur
+      leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
+      saveButton={
+        <Button buttonType="primary" type="submit">
+          Save
+        </Button>
+      }
+      onSubmit={onSubmit}
+      initialValues={initialValues()}
+    >
+      <ValidatedTextbox
+        label="Username"
+        labelInline
+        name="username"
+        required
+        validate={Yup.string().required("Username is required")}
+      />
+      <ValidatedTextbox
+        label="Email"
+        labelInline
+        name="email"
+        required
+        validate={Yup.string().required("Email is required")}
+      />
+      <Switch
+        checked={includePhone}
+        value={String(includePhone)}
+        onChange={handleSwitch}
+        label="include phone?"
+      />
+      {includePhone && (
+        <ValidatedTextbox
+          label="Phone"
+          labelInline
+          name="phone"
+          required
+          validate={Yup.string().required("Phone is required")}
+        />
+      )}
+    </ValidatedForm>
   );
 };
 
@@ -77,6 +138,10 @@ describe("ValidatedForm", () => {
   };
 
   const onSubmit = jest.fn();
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   test("rendering the form with all fields", () => {
     customRender(
@@ -162,6 +227,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -243,6 +309,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -319,6 +386,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -393,6 +461,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -479,6 +548,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -560,6 +630,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -636,6 +707,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -710,6 +782,7 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Username is required")).toBeInTheDocument();
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
+          expect(onSubmit).not.toHaveBeenCalled();
         });
 
         test("updating the form and submitting values", async () => {
@@ -849,7 +922,7 @@ describe("ValidatedForm", () => {
     });
   });
 
-  describe("when validateOnSubmit using withSummary on ValidatedRadioButtonGroup", () => {
+  describe("when using a ValidatedRadioButtonGroup", () => {
     let form, summary;
     beforeEach(() => {
       customRender(
@@ -905,7 +978,7 @@ describe("ValidatedForm", () => {
     });
   });
 
-  describe("when validateOnBlur with nested initialValues", () => {
+  describe("when using a nested initialValues", () => {
     beforeEach(() => {
       customRender(
         <ValidatedForm
@@ -981,109 +1054,196 @@ describe("ValidatedForm", () => {
       });
 
       expect(onSubmit).toHaveBeenCalledWith({
-        email: "jonathan.meaney@sage.com",
         username: "Jonathan",
+        personalDetails: {
+          email: "jonathan.meaney@sage.com",
+        },
       });
     });
   });
 
-  describe("when providing onClick to save button", () => {
-    const mockSave = jest.fn();
-
+  describe("when using a dynamic initialValues and inputs", () => {
     beforeEach(() => {
-      customRender(
-        <ValidatedForm
-          validateOnBlur
-          initialValues={nestedInitialValues}
-          onSubmit={onSubmit}
-          saveButton={
-            <Button buttonType="primary" type="submit" onClick={mockSave}>
-              Save
-            </Button>
-          }
-        >
-          <ValidatedTextbox
-            label="Username"
-            name="username"
-            validate={yupValidateUsername}
-          />
-          <ValidatedTextbox
-            label="Email"
-            name="personalDetails.email"
-            validate={yupValidateEmail}
-          />
-        </ValidatedForm>
-      );
+      customRender(<DynamicExample onSubmit={onSubmit} />);
     });
 
-    test("displaying validation errors when a field is touched and left empty", async () => {
-      expect(screen.queryByText("Username is required")).toBeNull();
-      expect(screen.queryByText("Email is required")).toBeNull();
-      expect(screen.queryByText("2 errors")).toBeNull();
-
-      // Blur each field
-      const username = screen.getByLabelText("Username");
-      const email = screen.getByLabelText("Email");
-
-      await act(async () => {
-        await user.click(username);
-        await user.click(email);
-        await user.click(username);
-      });
-
-      expect(screen.getByText("Username is required")).toBeInTheDocument();
-      expect(screen.getByText("Email is required")).toBeInTheDocument();
-      expect(screen.getByText("2 errors")).toBeInTheDocument();
+    test("rendering the form with all fields", () => {
+      expect(screen.getByLabelText("Username")).toBeInTheDocument();
+      expect(screen.getByLabelText("Email")).toBeInTheDocument();
+      expect(screen.getByText("include phone?")).toBeInTheDocument();
+      expect(screen.queryByLabelText("Phone Number")).toBeNull();
+      expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
     });
 
-    test("displaying validation errors on attempted submission", async () => {
-      expect(screen.queryByText("Username is required")).toBeNull();
-      expect(screen.queryByText("Email is required")).toBeNull();
-      expect(screen.queryByText("2 errors")).toBeNull();
+    describe("when not including dynamic fields", () => {
+      test("displaying validation errors when a field is touched and left empty", async () => {
+        expect(screen.queryByText("Username is required")).toBeNull();
+        expect(screen.queryByText("Email is required")).toBeNull();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.queryByText("2 errors")).toBeNull();
 
-      await act(async () => {
-        const saveButton = screen.getByRole("button", { name: "Save" });
-        await user.click(saveButton);
+        // Blur each field
+        const username = screen.getByLabelText("Username");
+        const email = screen.getByLabelText("Email");
+
+        await act(async () => {
+          await user.click(username);
+          await user.click(email);
+          await user.click(username);
+        });
+
+        expect(screen.getByText("Username is required")).toBeInTheDocument();
+        expect(screen.getByText("Email is required")).toBeInTheDocument();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.getByText("2 errors")).toBeInTheDocument();
       });
 
-      expect(screen.getByText("Username is required")).toBeInTheDocument();
-      expect(screen.getByText("Email is required")).toBeInTheDocument();
-      expect(screen.getByText("2 errors")).toBeInTheDocument();
-    });
+      test("displaying validation errors on attempted submission", async () => {
+        expect(screen.queryByText("Username is required")).toBeNull();
+        expect(screen.queryByText("Email is required")).toBeNull();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.queryByText("2 errors")).toBeNull();
 
-    test("updating the form and submitting values", async () => {
-      const username = screen.getByLabelText("Username");
-      const email = screen.getByLabelText("Email");
+        await act(async () => {
+          const saveButton = screen.getByRole("button", { name: "Save" });
+          await user.click(saveButton);
+        });
 
-      await act(async () => {
-        await user.click(username);
-        await user.type(username, "Jonathan");
-        await user.click(email);
-        await user.type(email, "jonathan.meaney@sage.com");
-        const saveButton = screen.getByRole("button", { name: "Save" });
-        await user.click(saveButton);
+        expect(screen.getByText("Username is required")).toBeInTheDocument();
+        expect(screen.getByText("Email is required")).toBeInTheDocument();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.getByText("2 errors")).toBeInTheDocument();
       });
 
-      expect(onSubmit).toHaveBeenCalledWith({
-        email: "jonathan.meaney@sage.com",
-        username: "Jonathan",
+      test("updating the form and submitting values", async () => {
+        const username = screen.getByLabelText("Username");
+        const email = screen.getByLabelText("Email");
+
+        await act(async () => {
+          await user.click(username);
+          await user.type(username, "Jonathan");
+          await user.click(email);
+          await user.type(email, "jonathan.meaney@sage.com");
+          const saveButton = screen.getByRole("button", { name: "Save" });
+          await user.click(saveButton);
+        });
+
+        expect(onSubmit).toHaveBeenCalledWith({
+          email: "jonathan.meaney@sage.com",
+          username: "Jonathan",
+        });
       });
     });
 
-    test("calling the save onClick", async () => {
-      const username = screen.getByLabelText("Username");
-      const email = screen.getByLabelText("Email");
-
-      await act(async () => {
-        await user.click(username);
-        await user.type(username, "Jonathan");
-        await user.click(email);
-        await user.type(email, "jonathan.meaney@sage.com");
-        const saveButton = screen.getByRole("button", { name: "Save" });
-        await user.click(saveButton);
+    describe("when including dynamic fields", () => {
+      beforeEach(async () => {
+        const includePhone = screen.getByRole("switch");
+        await act(async () => {
+          await user.click(includePhone);
+        });
       });
 
-      expect(mockSave).toHaveBeenCalled();
+      test("displaying validation errors when a field is touched and left empty", async () => {
+        expect(screen.queryByText("Username is required")).toBeNull();
+        expect(screen.queryByText("Email is required")).toBeNull();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.queryByText("3 errors")).toBeNull();
+
+        // Blur each field
+        const username = screen.getByLabelText("Username");
+        const email = screen.getByLabelText("Email");
+        const phone = screen.getByLabelText("Phone");
+
+        await act(async () => {
+          await user.click(username);
+          await user.click(email);
+          await user.click(phone);
+          await user.click(username);
+        });
+
+        expect(screen.getByText("Username is required")).toBeInTheDocument();
+        expect(screen.getByText("Email is required")).toBeInTheDocument();
+        expect(screen.getByText("Phone is required")).toBeInTheDocument();
+        expect(screen.getByText("3 errors")).toBeInTheDocument();
+      });
+
+      test("displaying validation errors on attempted submission", async () => {
+        expect(screen.queryByText("Username is required")).toBeNull();
+        expect(screen.queryByText("Email is required")).toBeNull();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.queryByText("3 errors")).toBeNull();
+
+        await act(async () => {
+          const saveButton = screen.getByRole("button", { name: "Save" });
+          await user.click(saveButton);
+        });
+
+        expect(screen.getByText("Username is required")).toBeInTheDocument();
+        expect(screen.getByText("Email is required")).toBeInTheDocument();
+        expect(screen.getByText("Phone is required")).toBeInTheDocument();
+        expect(screen.getByText("3 errors")).toBeInTheDocument();
+      });
+
+      test("updating the form and submitting values", async () => {
+        const username = screen.getByLabelText("Username");
+        const email = screen.getByLabelText("Email");
+        const phone = screen.getByLabelText("Phone");
+
+        await act(async () => {
+          await user.click(username);
+          await user.type(username, "Jonathan");
+          await user.click(email);
+          await user.type(email, "jonathan.meaney@sage.com");
+          await user.click(phone);
+          await user.type(phone, "1234567");
+          const saveButton = screen.getByRole("button", { name: "Save" });
+          await user.click(saveButton);
+        });
+
+        expect(onSubmit).toHaveBeenCalledWith({
+          email: "jonathan.meaney@sage.com",
+          username: "Jonathan",
+          phone: "1234567",
+        });
+      });
+    });
+
+    describe("when including dynamic fields validating and then removing dynamic fields", () => {
+      test("displaying dynamic validation errors on changing dynamic inputs", async () => {
+        // Include phone field
+        let includePhone = screen.getByRole("switch");
+        await act(async () => {
+          await user.click(includePhone);
+        });
+
+        expect(screen.queryByText("Username is required")).toBeNull();
+        expect(screen.queryByText("Email is required")).toBeNull();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.queryByText("3 errors")).toBeNull();
+
+        // Trigger validation on 3 fields
+        await act(async () => {
+          const saveButton = screen.getByRole("button", { name: "Save" });
+          await user.click(saveButton);
+        });
+
+        expect(screen.getByText("Username is required")).toBeInTheDocument();
+        expect(screen.getByText("Email is required")).toBeInTheDocument();
+        expect(screen.getByText("Phone is required")).toBeInTheDocument();
+        expect(screen.getByText("3 errors")).toBeInTheDocument();
+
+        // Exclude phone field
+        includePhone = screen.getByRole("switch");
+        await act(async () => {
+          await user.click(includePhone);
+        });
+
+        // Errors update for 2 fields
+        expect(screen.getByText("Username is required")).toBeInTheDocument();
+        expect(screen.getByText("Email is required")).toBeInTheDocument();
+        expect(screen.queryByText("Phone is required")).toBeNull();
+        expect(screen.getByText("2 errors")).toBeInTheDocument();
+      });
     });
   });
 });

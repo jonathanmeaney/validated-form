@@ -97,14 +97,14 @@ const getValue = ({ target: { value, type, checked } }) =>
   type === "checkbox"
     ? checked
     : value.formattedValue !== undefined
-      ? value.formattedValue
-      : value;
+    ? value.formattedValue
+    : value;
 
 const useFieldHandlers = (
   fieldName,
   canValidateOnBlur,
   canValidateOnChange,
-  fieldProps,
+  fieldProps
 ) => {
   const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
 
@@ -117,6 +117,7 @@ const useFieldHandlers = (
       }
 
       if (canValidate) {
+        console.log("validating");
         validateField(fieldName);
       }
 
@@ -126,7 +127,7 @@ const useFieldHandlers = (
         setFieldTouched,
       });
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
   );
 
   return {
@@ -204,7 +205,7 @@ const withFieldValidation = (Component) => {
       fieldName,
       canValidateOnBlur,
       canValidateOnChange,
-      fieldProps,
+      fieldProps
     );
 
     // Checkbox type components need some additional fields set: checked and value
@@ -218,8 +219,8 @@ const withFieldValidation = (Component) => {
         as={ComponentWithRef}
         innerRef={inputRef}
         value={fieldValue}
-        onChange={onChange}
-        onBlur={onBlur}
+        // onChange={onChange}
+        // onBlur={onBlur}
         {...fieldProps}
         {...checkboxProps}
         {...error}

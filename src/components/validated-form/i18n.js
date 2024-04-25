@@ -6,7 +6,10 @@ I18n.translations = I18n.translations || {};
 I18n.translations.en = assign({}, I18n.translations.en, {
   validated_form: {
     validation_summary: {
-      title: "There are %{count} errors",
+      title: {
+        one: "There is %{count} error",
+        other: "There are %{count} errors",
+      },
     },
   },
 });

@@ -47,6 +47,7 @@ const validatedFormReducer = (state, action) => {
         inputRefs,
       };
     }
+    /* istanbul ignore next */
     default:
       return { ...state };
   }

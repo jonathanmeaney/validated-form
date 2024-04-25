@@ -60,6 +60,22 @@ const App = () => {
     console.log("Submitting", values);
   };
 
+  const validateFirstName = (value) => {
+    let errorMessage;
+    if (!value) {
+      errorMessage = "First Name is required";
+    }
+    return errorMessage;
+  };
+
+  const validateLastName = (value) => {
+    let errorMessage;
+    if (!value) {
+      errorMessage = "Last Name is required";
+    }
+    return errorMessage;
+  };
+
   const validateEmail = (value) => {
     let errorMessage;
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
@@ -97,7 +113,7 @@ const App = () => {
       <h1>Validated Form Example - validation per input</h1>
       <ValidatedForm
         // validateOnSubmit
-        validateOnMount
+        validateOnChange
         withSummary
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
@@ -149,7 +165,9 @@ const App = () => {
           labelInline
           name="email"
           required
-          validate={validateEmail}
+          validate={Yup.string()
+            .email("Enter a valid email")
+            .required("Last Name is required")}
         />
         <ValidatedTextarea
           label="Description"
@@ -217,7 +235,6 @@ const App = () => {
       </h1>
       <ValidatedForm
         withSummary
-        validateOnBlur
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
@@ -262,14 +279,53 @@ const App = () => {
       <hr />
       <h1>Validated Form Example - Yup validation schema</h1>
       <ValidatedForm
-        validateOnBlur
+        withSummary
+        validateOnSubmit
         validationSchema={Yup.object({
           firstName: Yup.string().required("First Name is required"),
           lastName: Yup.string().required("Last Name is required"),
+          email: Yup.string()
+            .email("Enter a valid email")
+            .required("Email is required"),
         })}
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
+            Save
+          </Button>
+        }
+        onSubmit={handleSubmit}
+        initialValues={{
+          firstName: "",
+          lastName: "",
+          email: "",
+        }}
+      >
+        <ValidatedTextbox
+          label="First Name"
+          labelInline
+          name="firstName"
+          required
+        />
+        <ValidatedTextbox
+          label="Last Name"
+          labelInline
+          name="lastName"
+          required
+        />
+        <ValidatedTextbox label="Email" labelInline name="email" required />
+      </ValidatedForm>
+      <hr />
+      <h1>Validated Form Example - form validate</h1>
+      <ValidatedForm
+        validate={validate}
+        leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
+        saveButton={
+          <Button
+            buttonType="primary"
+            type="submit"
+            onClick={() => alert("hello")}
+          >
             Save
           </Button>
         }
@@ -293,9 +349,8 @@ const App = () => {
         />
       </ValidatedForm>
       <hr />
-      <h1>Validated Form Example - validation schema</h1>
+      <h1>Validated Form Example - js validate per input</h1>
       <ValidatedForm
-        validate={validate}
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
           <Button buttonType="primary" type="submit">
@@ -312,12 +367,14 @@ const App = () => {
           label="First Name"
           labelInline
           name="firstName"
+          validate={validateFirstName}
           required
         />
         <ValidatedTextbox
           label="Last Name"
           labelInline
           name="lastName"
+          validate={validateLastName}
           required
         />
       </ValidatedForm>
