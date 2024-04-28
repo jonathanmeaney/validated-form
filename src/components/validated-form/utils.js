@@ -1,3 +1,5 @@
+import { cloneDeep } from "lodash";
+
 export const touchedErrors = (touched, errors) => {
   const flattenedTouched = flatten(touched);
   const flattenedErrors = flatten(errors);
@@ -41,3 +43,82 @@ export const flatten = (obj) => {
   recursiveFlatten(obj);
   return result;
 };
+
+// Get the value from the object using dot notation e.g. 'a.b.c.d'
+export const getObjectValue = (obj, path) => {
+  /* istanbul ignore next */
+  if (!path) {
+    return undefined;
+  }
+
+  const parts = path.split(".");
+  let current = obj;
+
+  for (let part of parts) {
+    if (current[part] === undefined) {
+      return undefined;
+    }
+    current = current[part];
+  }
+
+  return current;
+};
+
+export const removeObjectField = (obj, path) => {
+  /* istanbul ignore next */
+  if (!path) {
+    return obj;
+  }
+
+  const parts = path.split(".");
+  const newObj = cloneDeep(obj);
+  let current = newObj;
+
+  // Navigate to the second to last part of the path
+  for (let i = 0; i < parts.length - 1; i++) {
+    let part = parts[i];
+    /* istanbul ignore next */
+    if (current[part] === undefined) {
+      return obj; // Return the original object if the path is invalid
+    }
+    // Make a shallow copy at each level
+    current[part] = { ...current[part] };
+    current = current[part];
+  }
+
+  // Delete the last part of the path if it exists
+  const lastPart = parts[parts.length - 1];
+  if (current[lastPart] !== undefined) {
+    delete current[lastPart];
+  }
+
+  return newObj;
+};
+
+// Check if the path is present in the object
+export const hasKey = (obj, path) => {
+  /* istanbul ignore next */
+  if (!path) {
+    return false;
+  }
+
+  const parts = path.split(".");
+  let current = obj;
+
+  for (let part of parts) {
+    /* istanbul ignore next */
+    if (current[part] === undefined) {
+      return false;
+    }
+    current = current[part];
+  }
+
+  return true;
+};
+
+export const getValue = ({ target: { value, type, checked } }) =>
+  type === "checkbox"
+    ? checked
+    : value.formattedValue !== undefined
+    ? value.formattedValue
+    : value;

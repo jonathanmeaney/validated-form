@@ -10,6 +10,7 @@ import ValidationSummary from "./validation-summary";
 import { ValidatedFormContextProvider } from "./validated-form-context";
 
 const ValidatedForm = ({
+  enableReinitialize = false,
   initialValues,
   validationSchema,
   validateOnChange = true,
@@ -23,35 +24,22 @@ const ValidatedForm = ({
   summaryTitle,
   ...formProps
 }) => {
-  const key = JSON.stringify(initialValues);
-
-  let canValidateOnChange = validateOnChange;
-  if (validateOnSubmit) {
-    canValidateOnChange = false;
-  }
-
-  let canValidateOnBlur = validateOnBlur;
-  if (validateOnSubmit) {
-    canValidateOnBlur = false;
-  }
-
-  let canValidateOnMount = validateOnMount;
-  if (validateOnSubmit) {
-    canValidateOnMount = false;
-  }
+  const canValidateOnChange = validateOnSubmit ? false : validateOnChange;
+  const canValidateOnBlur = validateOnSubmit ? false : validateOnBlur;
+  const canValidateOnMount = validateOnSubmit ? false : validateOnMount;
 
   return (
     <ValidatedFormContextProvider
-      validateOnMount={canValidateOnMount}
-      validateOnBlur={canValidateOnChange}
-      validateOnChange={canValidateOnChange}
+      validateOnMount={validateOnMount}
+      validateOnBlur={validateOnBlur}
+      validateOnChange={validateOnChange}
       validateOnSubmit={validateOnSubmit}
+      hasValidationSchema={validationSchema !== undefined}
+      hasValidate={validate !== undefined}
     >
       <Formik
         // This prop will cause the fields to update if the initialValues change.
-        // enableReinitialize
-        // Add key to ensure rerendering if initialValues changes
-        // key={key}
+        enableReinitialize={enableReinitialize}
         initialValues={initialValues}
         onSubmit={async (values, { validateForm }) => {
           // Validate the form one last time
@@ -65,8 +53,12 @@ const ValidatedForm = ({
         validateOnMount={canValidateOnMount}
         validate={validate}
       >
-        {({ handleSubmit, touched, errors, submitCount }) => {
+        {({ handleSubmit, touched, errors, values, submitCount }) => {
+          // Only show the validation summary if the withSummary prop is true and
+          // an actual attempt to submit has been made
           const canShowValidationSummary = submitCount > 0 && withSummary;
+          // Get the error count and message for any fields that have been touched
+          // and have errors
           const { errorCount, errorMessages } = touchedErrors(touched, errors);
           return (
             <>
@@ -93,6 +85,7 @@ const ValidatedForm = ({
 };
 
 ValidatedForm.propTypes = {
+  enableReinitialize: PropTypes.bool,
   initialValues: PropTypes.object.isRequired,
   validationSchema: PropTypes.object,
   validateOnChange: PropTypes.bool,
@@ -102,7 +95,6 @@ ValidatedForm.propTypes = {
   validate: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
-  saveButton: PropTypes.node,
   withSummary: PropTypes.bool,
   summaryTitle: PropTypes.string,
 };

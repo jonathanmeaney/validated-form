@@ -17,6 +17,7 @@ import ValidatedForm, {
 } from "./components/validated-form";
 
 import "./styles.scss";
+import Examples from "./components/validated-form/examples";
 
 const PersonalDetails = () => {
   return (
@@ -108,12 +109,13 @@ const App = () => {
     setIncludeEmail(e.target.checked);
   };
 
+  return <Examples />;
+
   return (
     <div className="app">
       <h1>Validated Form Example - validation per input</h1>
       <ValidatedForm
         // validateOnSubmit
-        validateOnChange
         withSummary
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
@@ -167,7 +169,7 @@ const App = () => {
           required
           validate={Yup.string()
             .email("Enter a valid email")
-            .required("Last Name is required")}
+            .required("Email is required")}
         />
         <ValidatedTextarea
           label="Description"
@@ -277,7 +279,7 @@ const App = () => {
         )}
       </ValidatedForm>
       <hr />
-      <h1>Validated Form Example - Yup validation schema</h1>
+      <h1>Validated Form Example - validateOnSubmit Yup validation schema</h1>
       <ValidatedForm
         withSummary
         validateOnSubmit
@@ -316,16 +318,57 @@ const App = () => {
         <ValidatedTextbox label="Email" labelInline name="email" required />
       </ValidatedForm>
       <hr />
+      <h1>
+        Validated Form Example - validateOnSubmit Yup validation per input
+      </h1>
+      <ValidatedForm
+        withSummary
+        validateOnSubmit
+        leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
+        saveButton={
+          <Button buttonType="primary" type="submit">
+            Save
+          </Button>
+        }
+        onSubmit={handleSubmit}
+        initialValues={{
+          firstName: "",
+          lastName: "",
+          email: "",
+        }}
+      >
+        <ValidatedTextbox
+          label="First Name"
+          labelInline
+          name="firstName"
+          validate={Yup.string().required("First Name is required")}
+          required
+        />
+        <ValidatedTextbox
+          label="Last Name"
+          labelInline
+          name="lastName"
+          validate={Yup.string().required("Last Name is required")}
+          required
+        />
+        <ValidatedTextbox
+          label="Email"
+          labelInline
+          name="email"
+          required
+          validate={Yup.string()
+            .email("Enter a valid email")
+            .required("Email is required")}
+        />
+      </ValidatedForm>
+      <hr />
       <h1>Validated Form Example - form validate</h1>
       <ValidatedForm
+        validateOnSubmit
         validate={validate}
         leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
         saveButton={
-          <Button
-            buttonType="primary"
-            type="submit"
-            onClick={() => alert("hello")}
-          >
+          <Button buttonType="primary" type="submit">
             Save
           </Button>
         }

@@ -13,6 +13,8 @@ const initialState = {
   validateOnBlur: false,
   validateOnChange: false,
   validateOnSubmit: false,
+  hasValidationSchema: false,
+  hasValidate: false,
 };
 
 export const actions = {
@@ -63,27 +65,25 @@ const ValidatedFormContext = createContext({
 const useValidatedForm = () => useContext(ValidatedFormContext);
 
 const ContextProvider = ({
-  initialState: propsInitialState,
   children,
   validateOnMount,
   validateOnBlur,
   validateOnChange,
   validateOnSubmit,
+  hasValidationSchema,
+  hasValidate,
 }) => {
-  const updatedInitialState = {
+  const [state, dispatch] = useReducer(validatedFormReducer, {
     ...initialState,
-    ...propsInitialState,
     validateOnMount,
     validateOnBlur,
     validateOnChange,
     validateOnSubmit,
-  };
+    hasValidationSchema,
+    hasValidate,
+  });
 
-  const [state, dispatch] = useReducer(
-    validatedFormReducer,
-    updatedInitialState
-  );
-
+  // Register an inputRef for use by the validation summary
   const registerInputRef = useCallback((name, inputRef) => {
     dispatch({
       type: actions.REGISTER_INPUT_REF,
@@ -91,6 +91,7 @@ const ContextProvider = ({
     });
   }, []);
 
+  // Deregister an inputRef when unmounting an input
   const deregisterInputRef = useCallback((name) => {
     dispatch({
       type: actions.DEREGISTER_INPUT_REF,
@@ -125,6 +126,8 @@ ContextProvider.propTypes = {
   validateOnBlur: PropTypes.bool,
   validateOnChange: PropTypes.bool,
   validateOnSubmit: PropTypes.bool,
+  hasValidationSchema: PropTypes.bool,
+  hasValidate: PropTypes.bool,
 };
 
 ContextProvider.defaultProps = {
@@ -133,6 +136,8 @@ ContextProvider.defaultProps = {
   validateOnBlur: false,
   validateOnChange: false,
   validateOnSubmit: false,
+  hasValidationSchema: false,
+  hasValidate: false,
 };
 
 const ValidatedFormContextProvider = ContextProvider;

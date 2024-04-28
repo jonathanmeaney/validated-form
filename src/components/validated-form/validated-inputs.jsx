@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef, memo } from "react";
 import PropTypes from "prop-types";
-import { isEqual, isEmpty, cloneDeep } from "lodash";
+import { isEqual } from "lodash";
 
 import { Field, useFormikContext } from "formik";
 
@@ -20,108 +20,51 @@ import { Select, Option } from "carbon-react/lib/components/select";
 
 import { useValidatedForm } from "./validated-form-context";
 import useFieldValidation from "./useFieldValidation";
+import { getObjectValue, removeObjectField, hasKey, getValue } from "./utils";
 
-// Get the value from the object using dot notation e.g. 'a.b.c.d'
-const getObjectValue = (obj, path) => {
-  /* istanbul ignore next */
-  if (!path) {
-    return undefined;
-  }
+// Custom Hook to generate event handlers for the validated Field
+const useFieldEventHandlers = (fieldName, fieldProps, fieldError) => {
+  const {
+    validateOnBlur,
+    validateOnChange,
+    validateOnSubmit,
+    hasValidationSchema,
+    hasValidate,
+  } = useValidatedForm();
+  const { setFieldValue, setFieldTouched, validateField, validateForm } =
+    useFormikContext();
 
-  const parts = path.split(".");
-  let current = obj;
-
-  for (let part of parts) {
-    if (current[part] === undefined) {
-      return undefined;
-    }
-    current = current[part];
-  }
-
-  return current;
-};
-
-const removeObjectField = (obj, path) => {
-  /* istanbul ignore next */
-  if (!path) {
-    return obj;
-  }
-
-  const parts = path.split(".");
-  const newObj = cloneDeep(obj);
-  let current = newObj;
-
-  // Navigate to the second to last part of the path
-  for (let i = 0; i < parts.length - 1; i++) {
-    let part = parts[i];
-    /* istanbul ignore next */
-    if (current[part] === undefined) {
-      return obj; // Return the original object if the path is invalid
-    }
-    // Make a shallow copy at each level
-    current[part] = { ...current[part] };
-    current = current[part];
-  }
-
-  // Delete the last part of the path if it exists
-  const lastPart = parts[parts.length - 1];
-  if (current[lastPart] !== undefined) {
-    delete current[lastPart];
-  }
-
-  return newObj;
-};
-
-// Check if the path is present in the object
-const hasKey = (obj, path) => {
-  /* istanbul ignore next */
-  if (!path) {
-    return false;
-  }
-
-  const parts = path.split(".");
-  let current = obj;
-
-  for (let part of parts) {
-    /* istanbul ignore next */
-    if (current[part] === undefined) {
-      return false;
-    }
-    current = current[part];
-  }
-
-  return true;
-};
-
-const getValue = ({ target: { value, type, checked } }) =>
-  type === "checkbox"
-    ? checked
-    : value.formattedValue !== undefined
-    ? value.formattedValue
-    : value;
-
-const useFieldHandlers = (
-  fieldName,
-  canValidateOnBlur,
-  canValidateOnChange,
-  fieldProps
-) => {
-  const { setFieldValue, setFieldTouched, validateField } = useFormikContext();
+  // Determine if and when you should be able to validate or revalidate a field
+  const canValidateOnBlur =
+    validateOnBlur &&
+    (!validateOnSubmit || (validateOnSubmit && fieldError !== undefined));
+  const canValidateOnChange =
+    validateOnChange &&
+    (!validateOnSubmit || (validateOnSubmit && fieldError !== undefined));
 
   const handleEvent = useCallback(
-    (eventName, canValidate) => (e) => {
-      setFieldValue(fieldName, getValue(e));
+    (eventName, canValidate) => async (e) => {
+      await setFieldValue(fieldName, getValue(e));
 
       if (eventName === "onBlur") {
-        setFieldTouched(fieldName, true);
+        await setFieldTouched(fieldName, true);
       }
 
       if (canValidate) {
-        console.log("validating");
-        validateField(fieldName);
+        // If the form has a validationSchema or a validate prop
+        // the the form  has no per input validation, validate the form
+        // to trigger field revalidation. Otherwise trigger field validation.
+        if (hasValidationSchema || hasValidate) {
+          await validateForm();
+        } else {
+          await validateField(fieldName);
+        }
       }
 
+      // If given a custom onChange or onBlur event then call it
+      // now passing in e and formik methods for field validations
       fieldProps[eventName]?.(e, {
+        validateForm,
         validateField,
         setFieldValue,
         setFieldTouched,
@@ -137,6 +80,8 @@ const useFieldHandlers = (
 };
 
 const withFieldValidation = (Component) => {
+  // Custom component to take a ref and apply it to the
+  // component itself or to a div surrounding.
   const ComponentWithRef = ({ innerRef, ...props }) => {
     if (["RadioButtonGroup", "CheckboxGroup"].includes(Component.displayName)) {
       return (
@@ -153,13 +98,7 @@ const withFieldValidation = (Component) => {
     const fieldProps = { ...otherProps };
     const inputRef = useRef(null);
 
-    const {
-      registerInputRef,
-      deregisterInputRef,
-      validateOnBlur,
-      validateOnChange,
-      validateOnSubmit,
-    } = useValidatedForm();
+    const { registerInputRef, deregisterInputRef } = useValidatedForm();
     // Generate the validate function for the Field using the validate passed
     // into the component directly (if present)
     const validateCallback = useFieldValidation(validate);
@@ -171,7 +110,7 @@ const withFieldValidation = (Component) => {
       setFieldTouched,
       setValues,
     } = useFormikContext();
-    const fieldName = fieldProps.name;
+    const { name: fieldName } = fieldProps;
     const fieldTouched = getObjectValue(touched, fieldName);
     const fieldError = getObjectValue(errors, fieldName);
     const fieldValue = getObjectValue(values, fieldName) || "";
@@ -193,19 +132,11 @@ const withFieldValidation = (Component) => {
       };
     }, [inputRef]);
 
-    // Determine if and when you should be able to validate or revalidate a field
-    const canValidateOnBlur =
-      validateOnBlur && (!validateOnSubmit || (validateOnSubmit && fieldError));
-    const canValidateOnChange =
-      validateOnChange &&
-      (!validateOnSubmit || (validateOnSubmit && fieldError));
-
     // Define the onChange and onBlur event handlers for the field
-    const { onChange, onBlur } = useFieldHandlers(
+    const { onChange, onBlur } = useFieldEventHandlers(
       fieldName,
-      canValidateOnBlur,
-      canValidateOnChange,
-      fieldProps
+      fieldProps,
+      fieldError
     );
 
     // Checkbox type components need some additional fields set: checked and value
@@ -219,17 +150,18 @@ const withFieldValidation = (Component) => {
         as={ComponentWithRef}
         innerRef={inputRef}
         value={fieldValue}
-        // onChange={onChange}
-        // onBlur={onBlur}
         {...fieldProps}
         {...checkboxProps}
         {...error}
+        onChange={onChange}
+        onBlur={onBlur}
       />
     );
   };
 
   ValidatedComponent.propTypes = {
     name: PropTypes.string.isRequired,
+    validate: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
     innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
   };
 
