@@ -664,6 +664,7 @@ const ComplexYupSignup = () => {
 
   return (
     <ValidatedForm
+      withSummary
       leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
       saveButton={
         <Button buttonType="primary" type="submit">
