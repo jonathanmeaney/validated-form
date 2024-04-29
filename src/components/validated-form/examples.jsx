@@ -7,6 +7,9 @@ import ValidatedForm, {
   ValidatedTextarea,
   ValidatedPassword,
   ValidatedCheckbox,
+  ValidatedDecimal,
+  ValidatedNumber,
+  ValidatedNumeralDate,
   ValidatedDateInput,
   ValidatedSwitch,
   ValidatedSelect,
@@ -601,7 +604,7 @@ const ComplexForm = () => {
         required
         validate={Yup.boolean().oneOf(
           [true],
-          "You must Accept Terms and Conditions",
+          "You must Accept Terms and Conditions"
         )}
       />
       <ValidatedSwitch
@@ -696,9 +699,127 @@ const ComplexYupSignup = () => {
           .min(12, "Username should be at least 12 characters")
           .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/,
-            "Password should have at least one lowercase letter, at least one uppercase letter, at least one number and at least one special character.",
+            "Password should have at least one lowercase letter, at least one uppercase letter, at least one number and at least one special character."
           )}
         required
+      />
+    </ValidatedForm>
+  );
+};
+
+const EveryInput = () => {
+  const handleSubmit = (values) => {
+    console.log("Submitting", values);
+  };
+
+  return (
+    <ValidatedForm
+      withSummary
+      leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
+      saveButton={
+        <Button buttonType="primary" type="submit">
+          Save
+        </Button>
+      }
+      onSubmit={handleSubmit}
+      initialValues={{
+        username: "",
+        password: "",
+        description: "",
+        agreeTerms: false,
+        enableSpyware: false,
+        temperature: "",
+        number: "",
+        color: "",
+        dob: "",
+        dobNum: null,
+      }}
+    >
+      <h2>Signup</h2>
+      <ValidatedTextbox
+        label="Username"
+        name="username"
+        validate={Yup.string().required("Username is required")}
+        required
+      />
+      <ValidatedPassword
+        label="Password"
+        name="password"
+        validate={Yup.string().required("Password is required")}
+        required
+      />
+      <ValidatedTextarea
+        label="Description"
+        name="description"
+        validate={Yup.string().required("Description is required")}
+        required
+      />
+      <ValidatedCheckbox
+        label="Agree To Terms"
+        name="agreeTerms"
+        validate={Yup.boolean().oneOf(
+          [true],
+          "You must Accept Terms and Conditions"
+        )}
+        required
+      />
+      <ValidatedSwitch
+        label="Enable Spyware"
+        labelInline
+        name="enableSpyware"
+        checked={false}
+        required
+        validate={Yup.boolean().oneOf([true], "You must enable spyware")}
+      />
+      <ValidatedDecimal
+        label="Temperature"
+        name="temperature"
+        validate={Yup.string().required("Temperature is required")}
+        required
+      />
+      <ValidatedNumber
+        label="Number"
+        name="number"
+        validate={Yup.string().required("Number is required")}
+        required
+      />
+      <ValidatedSelect
+        name="color"
+        id="color"
+        label="Color"
+        labelInline
+        required
+        validate={Yup.string().required("Color is required")}
+      >
+        <Option text="Amber" value="1" />
+        <Option text="Black" value="2" />
+        <Option text="Blue" value="3" />
+        <Option text="Brown" value="4" />
+        <Option text="Green" value="5" />
+        <Option text="Orange" value="6" />
+        <Option text="Pink" value="7" />
+        <Option text="Purple" value="8" />
+        <Option text="Red" value="9" />
+        <Option text="White" value="10" />
+        <Option text="Yellow" value="11" />
+      </ValidatedSelect>
+      <ValidatedDateInput
+        label="Date of Birth"
+        labelInline
+        name="dob"
+        required
+        validate={Yup.string().required("Date of Birth is required")}
+      />
+      <ValidatedNumeralDate
+        label="Date of Birth Numeral"
+        labelInline
+        name="dobNum"
+        required
+        validate={Yup.object({
+          yyyy: Yup.string().required("Please enter a year"),
+          mm: Yup.string().required("Please enter a month"),
+          dd: Yup.string().required("Please enter a day"),
+        })}
       />
     </ValidatedForm>
   );
@@ -742,6 +863,9 @@ const Examples = () => {
       <hr />
       <h1>ComplexYupSignup</h1>
       <ComplexYupSignup />
+      <hr />
+      <h1>EveryInput</h1>
+      <EveryInput />
     </>
   );
 };

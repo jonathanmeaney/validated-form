@@ -71,7 +71,7 @@ const useFieldEventHandlers = (fieldName, fieldProps, fieldError) => {
         setFieldTouched,
       });
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
   );
 
   return {
@@ -84,12 +84,18 @@ const withFieldValidation = (Component) => {
   // Custom component to take a ref and apply it to the
   // component itself or to a div surrounding.
   const ComponentWithRef = ({ innerRef, ...props }) => {
-    if (["RadioButtonGroup", "CheckboxGroup"].includes(Component.displayName)) {
+    const { displayName } = Component;
+
+    if (["RadioButtonGroup", "CheckboxGroup"].includes(displayName)) {
       return (
         <div ref={innerRef}>
           <Component {...props} />
         </div>
       );
+    }
+
+    if (["NumeralDate"].includes(displayName)) {
+      return <Component {...props} dayRef={innerRef} />;
     }
 
     return <Component ref={innerRef} {...props} />;
@@ -137,7 +143,7 @@ const withFieldValidation = (Component) => {
     const { onChange, onBlur } = useFieldEventHandlers(
       fieldName,
       fieldProps,
-      fieldError,
+      fieldError
     );
 
     // Checkbox type components need some additional fields set: checked and value
