@@ -116,9 +116,14 @@ export const hasKey = (obj, path) => {
   return true;
 };
 
-export const getValue = ({ target: { value, type, checked } }) =>
-  type === "checkbox"
-    ? checked
-    : value.formattedValue !== undefined
-    ? value.formattedValue
-    : value;
+export const getValue = ({ target: { value, type, checked } }) => {
+  if (type === "checkbox") {
+    return checked;
+  }
+
+  if (value.formattedValue !== undefined) {
+    return value.formattedValue;
+  }
+
+  return value;
+};

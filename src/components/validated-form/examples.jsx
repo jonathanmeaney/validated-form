@@ -5,6 +5,7 @@ import Switch from "carbon-react/lib/components/switch";
 import ValidatedForm, {
   ValidatedTextbox,
   ValidatedTextarea,
+  ValidatedPassword,
   ValidatedCheckbox,
   ValidatedDateInput,
   ValidatedSwitch,
@@ -600,7 +601,7 @@ const ComplexForm = () => {
         required
         validate={Yup.boolean().oneOf(
           [true],
-          "You must Accept Terms and Conditions"
+          "You must Accept Terms and Conditions",
         )}
       />
       <ValidatedSwitch
@@ -656,6 +657,52 @@ const ComplexForm = () => {
   );
 };
 
+const ComplexYupSignup = () => {
+  const handleSubmit = (values) => {
+    console.log("Submitting", values);
+  };
+
+  return (
+    <ValidatedForm
+      leftSideButtons={<Button buttonType="tertiary">Cancel</Button>}
+      saveButton={
+        <Button buttonType="primary" type="submit">
+          Save
+        </Button>
+      }
+      onSubmit={handleSubmit}
+      initialValues={{
+        username: "",
+        password: "",
+      }}
+    >
+      <h2>Signup</h2>
+      <ValidatedTextbox
+        label="Username"
+        name="username"
+        validate={Yup.string()
+          .required("Username is required")
+          .min(2, "Username should be longer than 2 characters")
+          .max(12, "Username should be less than 12 characters")
+          .matches(/^[a-zA-Z]+$/, "Username should only contain letters")}
+        required
+      />
+      <ValidatedPassword
+        label="Password"
+        name="password"
+        validate={Yup.string()
+          .required("Password is required")
+          .min(12, "Username should be at least 12 characters")
+          .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/,
+            "Password should have at least one lowercase letter, at least one uppercase letter, at least one number and at least one special character.",
+          )}
+        required
+      />
+    </ValidatedForm>
+  );
+};
+
 const Examples = () => {
   return (
     <>
@@ -691,6 +738,9 @@ const Examples = () => {
       <hr />
       <h1>ComplexForm</h1>
       <ComplexForm />
+      <hr />
+      <h1>ComplexYupSignup</h1>
+      <ComplexYupSignup />
     </>
   );
 };

@@ -109,7 +109,11 @@ const App = () => {
     setIncludeEmail(e.target.checked);
   };
 
-  return <Examples />;
+  return (
+    <div className="app">
+      <Examples />
+    </div>
+  );
 
   return (
     <div className="app">
@@ -185,7 +189,7 @@ const App = () => {
           required
           validate={Yup.boolean().oneOf(
             [true],
-            "You must Accept Terms and Conditions"
+            "You must Accept Terms and Conditions",
           )}
         />
         <ValidatedSwitch

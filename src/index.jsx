@@ -10,10 +10,10 @@ import App from "./App";
 const rootElement = document.getElementById("root");
 ReactDOM.render(
   <StrictMode>
-    {/* <GlobalStyle /> */}
+    <GlobalStyle />
     <CarbonProvider theme={sageTheme} validationRedesignOptIn>
       <App />
     </CarbonProvider>
   </StrictMode>,
-  rootElement
+  rootElement,
 );

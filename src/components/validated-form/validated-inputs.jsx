@@ -17,6 +17,7 @@ import {
   RadioButtonGroup,
 } from "carbon-react/lib/components/radio-button";
 import { Select, Option } from "carbon-react/lib/components/select";
+import Password from "carbon-react/lib/components/password";
 
 import { useValidatedForm } from "./validated-form-context";
 import useFieldValidation from "./useFieldValidation";
@@ -70,7 +71,7 @@ const useFieldEventHandlers = (fieldName, fieldProps, fieldError) => {
         setFieldTouched,
       });
     },
-    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps]
+    [fieldName, setFieldValue, setFieldTouched, validateField, fieldProps],
   );
 
   return {
@@ -136,7 +137,7 @@ const withFieldValidation = (Component) => {
     const { onChange, onBlur } = useFieldEventHandlers(
       fieldName,
       fieldProps,
-      fieldError
+      fieldError,
     );
 
     // Checkbox type components need some additional fields set: checked and value
@@ -170,6 +171,7 @@ const withFieldValidation = (Component) => {
 
 export const ValidatedTextbox = withFieldValidation(Textbox);
 export const ValidatedTextarea = withFieldValidation(Textarea);
+export const ValidatedPassword = withFieldValidation(Password);
 export const ValidatedCheckbox = withFieldValidation(Checkbox);
 // TODO: Add support for CheckboxGroup
 // export const ValidatedCheckboxGroup = withFieldValidation(CheckboxGroup);

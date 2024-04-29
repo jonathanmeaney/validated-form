@@ -107,7 +107,7 @@ const ContextProvider = ({
       registerInputRef,
       deregisterInputRef,
     };
-  }, [state, registerInputRef]);
+  }, [state, registerInputRef, deregisterInputRef]);
 
   return (
     <ValidatedFormContext.Provider value={value}>
@@ -121,7 +121,6 @@ ContextProvider.propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]).isRequired,
-  initialState: PropTypes.object,
   validateOnMount: PropTypes.bool,
   validateOnBlur: PropTypes.bool,
   validateOnChange: PropTypes.bool,
@@ -131,7 +130,6 @@ ContextProvider.propTypes = {
 };
 
 ContextProvider.defaultProps = {
-  initialState: {},
   validateOnMount: false,
   validateOnBlur: false,
   validateOnChange: false,
