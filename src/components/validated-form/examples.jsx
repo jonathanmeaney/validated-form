@@ -731,6 +731,7 @@ const EveryInput = () => {
         temperature: "",
         number: "",
         color: "",
+        supscriptionType: "",
         dob: "",
         dobNum: null,
       }}
@@ -803,6 +804,14 @@ const EveryInput = () => {
         <Option text="White" value="10" />
         <Option text="Yellow" value="11" />
       </ValidatedSelect>
+      <ValidatedRadioButtonGroup
+        legend="Subscription Type"
+        name="supscriptionType"
+        validate={Yup.string().required("Subscription Type is required")}
+      >
+        <RadioButton id="subscription-1" value="monthly" label="Monthly" />
+        <RadioButton id="subscription-2" value="yearly" label="Yearly" />
+      </ValidatedRadioButtonGroup>
       <ValidatedDateInput
         label="Date of Birth"
         labelInline
@@ -828,7 +837,7 @@ const EveryInput = () => {
 const Examples = () => {
   return (
     <>
-      <h1>YupPerInput</h1>
+      {/* <h1>YupPerInput</h1>
       <YupPerInput />
       <hr />
       <h1>YupPerForm</h1>
@@ -862,7 +871,7 @@ const Examples = () => {
       <ComplexForm />
       <hr />
       <h1>ComplexYupSignup</h1>
-      <ComplexYupSignup />
+      <ComplexYupSignup /> */}
       <hr />
       <h1>EveryInput</h1>
       <EveryInput />

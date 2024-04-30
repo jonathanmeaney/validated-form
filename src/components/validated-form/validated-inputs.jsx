@@ -80,113 +80,144 @@ const useFieldEventHandlers = (fieldName, fieldProps, fieldError) => {
   };
 };
 
-const withFieldValidation = (Component) => {
+const useValidatedField = (Component, { validate, ...otherProps }) => {
+  const fieldProps = { ...otherProps };
+  const inputRef = useRef(null);
+
+  const { registerInputRef, deregisterInputRef } = useValidatedForm();
+  // Generate the validate function for the Field using the validate passed
+  // into the component directly (if present)
+  const validateCallback = useFieldValidation(validate);
+  const { touched, errors, values, setFieldValue, setFieldTouched, setValues } =
+    useFormikContext();
+  const { name: fieldName } = fieldProps;
+  const fieldTouched = getObjectValue(touched, fieldName);
+  const fieldError = getObjectValue(errors, fieldName);
+  const fieldValue = getObjectValue(values, fieldName) || "";
+  const error = fieldTouched && fieldError ? { error: fieldError } : {};
+
+  // Register the components inputRef with the context. Used to set focus
+  // from the ValidationSummary.
+  useEffect(() => {
+    if (fieldName) {
+      registerInputRef(fieldName, inputRef);
+      if (!hasKey(values, fieldName)) setFieldValue(fieldName, fieldValue);
+    }
+
+    // When unmounting deregister
+    return () => {
+      deregisterInputRef(fieldName);
+      setValues((prev) => removeObjectField(prev, fieldName));
+      setFieldTouched(fieldName, false);
+    };
+  }, [inputRef]);
+
+  // Define the onChange and onBlur event handlers for the field
+  const { onChange, onBlur } = useFieldEventHandlers(
+    fieldName,
+    fieldProps,
+    fieldError
+  );
+
+  return (
+    <Field
+      validate={validateCallback}
+      as={Component}
+      innerRef={inputRef}
+      value={fieldValue}
+      {...fieldProps}
+      {...error}
+      onChange={onChange}
+      onBlur={onBlur}
+    />
+  );
+};
+
+const validatedComponentPropTypes = {
+  name: PropTypes.string.isRequired,
+  validate: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+  innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+};
+
+const withDefaultFieldValidation = (Component) => {
   // Custom component to take a ref and apply it to the
   // component itself or to a div surrounding.
   const ComponentWithRef = ({ innerRef, ...props }) => {
-    const { displayName } = Component;
-
-    if (["RadioButtonGroup", "CheckboxGroup"].includes(displayName)) {
-      return (
-        <div ref={innerRef}>
-          <Component {...props} />
-        </div>
-      );
-    }
-
-    if (["NumeralDate"].includes(displayName)) {
-      return <Component {...props} dayRef={innerRef} />;
-    }
-
     return <Component ref={innerRef} {...props} />;
   };
 
-  const ValidatedComponent = ({ validate, ...otherProps }) => {
-    const fieldProps = { ...otherProps };
-    const inputRef = useRef(null);
-
-    const { registerInputRef, deregisterInputRef } = useValidatedForm();
-    // Generate the validate function for the Field using the validate passed
-    // into the component directly (if present)
-    const validateCallback = useFieldValidation(validate);
-    const {
-      touched,
-      errors,
-      values,
-      setFieldValue,
-      setFieldTouched,
-      setValues,
-    } = useFormikContext();
-    const { name: fieldName } = fieldProps;
-    const fieldTouched = getObjectValue(touched, fieldName);
-    const fieldError = getObjectValue(errors, fieldName);
-    const fieldValue = getObjectValue(values, fieldName) || "";
-    const error = fieldTouched && fieldError ? { error: fieldError } : {};
-
-    // Register the components inputRef with the context. Used to set focus
-    // from the ValidationSummary.
-    useEffect(() => {
-      if (fieldName) {
-        registerInputRef(fieldName, inputRef);
-        if (!hasKey(values, fieldName)) setFieldValue(fieldName, fieldValue);
-      }
-
-      // When unmounting deregister
-      return () => {
-        deregisterInputRef(fieldName);
-        setValues((prev) => removeObjectField(prev, fieldName));
-        setFieldTouched(fieldName, false);
-      };
-    }, [inputRef]);
-
-    // Define the onChange and onBlur event handlers for the field
-    const { onChange, onBlur } = useFieldEventHandlers(
-      fieldName,
-      fieldProps,
-      fieldError
-    );
-
-    // Checkbox type components need some additional fields set: checked and value
-    const checkboxProps = ["Checkbox", "Switch"].includes(Component.displayName)
-      ? { checked: values[fieldName], value: String(values[fieldName]) }
-      : {};
-
-    return (
-      <Field
-        validate={validateCallback}
-        as={ComponentWithRef}
-        innerRef={inputRef}
-        value={fieldValue}
-        {...fieldProps}
-        {...checkboxProps}
-        {...error}
-        onChange={onChange}
-        onBlur={onBlur}
-      />
-    );
+  const ValidatedComponent = (props) => {
+    return useValidatedField(ComponentWithRef, props);
   };
 
-  ValidatedComponent.propTypes = {
-    name: PropTypes.string.isRequired,
-    validate: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-    innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-  };
+  ValidatedComponent.propTypes = validatedComponentPropTypes;
 
   return memo(ValidatedComponent, isEqual);
 };
 
-export const ValidatedTextbox = withFieldValidation(Textbox);
-export const ValidatedTextarea = withFieldValidation(Textarea);
-export const ValidatedPassword = withFieldValidation(Password);
-export const ValidatedCheckbox = withFieldValidation(Checkbox);
+const withCheckboxFieldValidation = (Component) => {
+  // Custom component to take a ref and apply it to the
+  // component itself or to a div surrounding.
+  const ComponentWithRef = ({ innerRef, ...props }) => {
+    return <Component ref={innerRef} {...props} />;
+  };
+
+  const ValidatedComponent = (props) => {
+    const { values } = useFormikContext();
+    // Checkbox type components need some additional fields set: checked and value
+    const checkboxProps = ["Checkbox", "Switch"].includes(Component.displayName)
+      ? { checked: values[props.name], value: String(values[props.name]) }
+      : {};
+
+    const updatedProps = {
+      ...props,
+      ...checkboxProps,
+    };
+
+    return useValidatedField(ComponentWithRef, updatedProps);
+  };
+
+  ValidatedComponent.propTypes = validatedComponentPropTypes;
+
+  return memo(ValidatedComponent, isEqual);
+};
+
+const withRadioButtonGroupFieldValidation = (Component) => {
+  // Custom component to take a ref and apply it to the
+  // component itself or to a div surrounding.
+  const ComponentWithRef = ({ innerRef, children, ...props }) => {
+    const enhancedChildren = React.Children.map(children, (child, index) => {
+      if (index === 0) {
+        return React.cloneElement(child, { ref: innerRef });
+      }
+      return child;
+    });
+
+    return <Component {...props} children={enhancedChildren} />;
+  };
+
+  const ValidatedComponent = (props) => {
+    return useValidatedField(ComponentWithRef, props);
+  };
+
+  ValidatedComponent.propTypes = validatedComponentPropTypes;
+
+  return memo(ValidatedComponent, isEqual);
+};
+
+export const ValidatedTextbox = withDefaultFieldValidation(Textbox);
+export const ValidatedTextarea = withDefaultFieldValidation(Textarea);
+export const ValidatedPassword = withDefaultFieldValidation(Password);
+export const ValidatedCheckbox = withCheckboxFieldValidation(Checkbox);
 // TODO: Add support for CheckboxGroup
-// export const ValidatedCheckboxGroup = withFieldValidation(CheckboxGroup);
-export const ValidatedSwitch = withFieldValidation(Switch);
-export const ValidatedDecimal = withFieldValidation(Decimal);
-export const ValidatedNumber = withFieldValidation(Number);
-export const ValidatedSelect = withFieldValidation(Select);
+// export const ValidatedCheckboxGroup = withDefaultFieldValidation(CheckboxGroup);
+export const ValidatedSwitch = withCheckboxFieldValidation(Switch);
+export const ValidatedDecimal = withDefaultFieldValidation(Decimal);
+export const ValidatedNumber = withDefaultFieldValidation(Number);
+export const ValidatedSelect = withDefaultFieldValidation(Select);
 export { Option };
-export const ValidatedDateInput = withFieldValidation(DateInput);
-export const ValidatedNumeralDate = withFieldValidation(NumeralDate);
+export const ValidatedDateInput = withDefaultFieldValidation(DateInput);
+export const ValidatedNumeralDate = withDefaultFieldValidation(NumeralDate);
 export { RadioButton };
-export const ValidatedRadioButtonGroup = withFieldValidation(RadioButtonGroup);
+export const ValidatedRadioButtonGroup =
+  withRadioButtonGroupFieldValidation(RadioButtonGroup);
