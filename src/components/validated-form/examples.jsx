@@ -733,10 +733,9 @@ const EveryInput = () => {
         color: "",
         supscriptionType: "",
         dob: "",
-        dobNum: null,
+        dobNum: { dd: "", mm: "", yyyy: "" },
       }}
     >
-      <h2>Signup</h2>
       <ValidatedTextbox
         label="Username"
         name="username"
