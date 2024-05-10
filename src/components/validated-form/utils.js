@@ -24,6 +24,13 @@ export const touchedErrors = (touched, errors) => {
   };
 };
 
+// Is a NumericDateObject
+const isDateObject = (obj) => {
+  const keys = Object.keys(obj);
+  const dateKeys = ["dd", "mm", "yyyy"];
+  return keys.length === 3 && dateKeys.every((key) => keys.includes(key));
+};
+
 export const flatten = (obj) => {
   let result = {};
 
@@ -32,7 +39,7 @@ export const flatten = (obj) => {
       // Construct the full path to the current key
       const currentPath = path ? `${path}.${key}` : key;
 
-      if (typeof item[key] === "object") {
+      if (typeof item[key] === "object" && !isDateObject(item[key])) {
         recursiveFlatten(item[key], currentPath);
       } else {
         result[currentPath] = item[key];
