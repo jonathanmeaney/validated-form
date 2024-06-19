@@ -40,11 +40,7 @@ const useValidatedField = (Component, { validate, ...otherProps }) => {
   }, [inputRef]);
 
   // Define the onChange and onBlur event handlers for the field
-  const { onChange, onBlur } = useFieldEventHandlers(
-    fieldName,
-    fieldProps,
-    fieldError
-  );
+  const { onChange, onBlur } = useFieldEventHandlers(fieldName, fieldProps);
 
   return (
     <Field

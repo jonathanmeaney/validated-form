@@ -6,7 +6,7 @@ import { useFormikContext } from "formik";
 
 import Textbox from "carbon-react/lib/components/textbox";
 import Textarea from "carbon-react/lib/components/textarea";
-import { Checkbox, CheckboxGroup } from "carbon-react/lib/components/checkbox";
+import { Checkbox } from "carbon-react/lib/components/checkbox";
 import Switch from "carbon-react/lib/components/switch";
 import DateInput from "carbon-react/lib/components/date";
 import Decimal from "carbon-react/lib/components/decimal";
@@ -22,26 +22,52 @@ import Password from "carbon-react/lib/components/password";
 import useValidatedField from "./useValidatedField";
 
 // Modified components to handle a ref
+/* istanbul ignore next */
 const TextboxWithRef = ({ innerRef, ...props }) => {
   return <Textbox ref={innerRef} {...props} />;
 };
 
+TextboxWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+};
+
+/* istanbul ignore next */
 const TextareaWithRef = ({ innerRef, ...props }) => {
   return <Textarea ref={innerRef} {...props} />;
 };
 
+TextareaWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+};
+
+/* istanbul ignore next */
 const DecimalWithRef = ({ innerRef, ...props }) => {
   return <Decimal ref={innerRef} {...props} />;
 };
 
+DecimalWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+};
+
+/* istanbul ignore next */
 const NumberWithRef = ({ innerRef, ...props }) => {
   return <Number ref={innerRef} {...props} />;
 };
 
+NumberWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+};
+
+/* istanbul ignore next */
 const PasswordWithRef = ({ innerRef, ...props }) => {
   return <Password ref={innerRef} {...props} />;
 };
 
+PasswordWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+};
+
+/* istanbul ignore next */
 const CheckboxWithRef = ({ innerRef, ...props }) => {
   const { values } = useFormikContext();
   const checkboxProps = {
@@ -52,6 +78,12 @@ const CheckboxWithRef = ({ innerRef, ...props }) => {
   return <Checkbox ref={innerRef} {...props} {...checkboxProps} />;
 };
 
+CheckboxWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+  name: PropTypes.string,
+};
+
+/* istanbul ignore next */
 const SwitchWithRef = ({ innerRef, ...props }) => {
   const { values } = useFormikContext();
   const switchProps = {
@@ -62,6 +94,12 @@ const SwitchWithRef = ({ innerRef, ...props }) => {
   return <Switch ref={innerRef} {...props} {...switchProps} />;
 };
 
+SwitchWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+  name: PropTypes.string,
+};
+
+/* istanbul ignore next */
 const RadioButtonGroupWithRef = ({ innerRef, children, ...props }) => {
   const enhancedChildren = React.Children.map(children, (child, index) => {
     if (index === 0) {
@@ -69,17 +107,33 @@ const RadioButtonGroupWithRef = ({ innerRef, children, ...props }) => {
     }
     return child;
   });
-  return <RadioButtonGroup children={enhancedChildren} {...props} />;
+  return <RadioButtonGroup {...props}>{enhancedChildren}</RadioButtonGroup>;
 };
 
+RadioButtonGroupWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+  children: PropTypes.node,
+};
+
+/* istanbul ignore next */
 const SelectWithRef = ({ innerRef, ...props }) => {
   return <Select ref={innerRef} {...props} />;
 };
 
+SelectWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+};
+
+/* istanbul ignore next */
 const DateInputWithRef = ({ innerRef, ...props }) => {
   return <DateInput ref={innerRef} {...props} />;
 };
 
+DateInputWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+};
+
+/* istanbul ignore next */
 const NumeralDateWithRef = ({ innerRef, ...props }) => {
   const { values } = useFormikContext();
   const value = values[props.name] || {};
@@ -101,6 +155,11 @@ const NumeralDateWithRef = ({ innerRef, ...props }) => {
       yearRef={yearRef}
     />
   );
+};
+
+NumeralDateWithRef.propTypes = {
+  innerRef: PropTypes.shape({ current: PropTypes.any }),
+  name: PropTypes.string,
 };
 
 // Factory function for creating HOCs with validation
