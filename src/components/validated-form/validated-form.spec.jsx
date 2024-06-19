@@ -12,6 +12,7 @@ import Switch from "carbon-react/lib/components/switch";
 
 import ValidatedForm, {
   ValidatedTextbox,
+  Textbox,
   RadioButton,
   ValidatedRadioButtonGroup,
 } from "./index.jsx";
@@ -156,6 +157,7 @@ describe("ValidatedForm", () => {
         }
       >
         <ValidatedTextbox label="Username" name="username" />
+        <Textbox label="Hint" name="hint" />
         <ValidatedTextbox label="Email" name="email" />
       </ValidatedForm>
     );
