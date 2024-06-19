@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1718831501109" clover="3.2.0">
-  <project timestamp="1718831501109" name="All files">
+<coverage generated="1718832007790" clover="3.2.0">
+  <project timestamp="1718832007790" name="All files">
     <metrics statements="203" coveredstatements="201" conditionals="65" coveredconditionals="61" methods="38" coveredmethods="35" elements="306" coveredelements="297" complexity="0" loc="203" ncloc="203" packages="1" files="11" classes="11"/>
     <file name="adapted-inputs.jsx" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/adapted-inputs.jsx">
       <metrics statements="43" coveredstatements="43" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
