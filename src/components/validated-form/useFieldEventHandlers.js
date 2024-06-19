@@ -4,7 +4,7 @@ import { useFormikContext } from "formik";
 import { getValue } from "./utils";
 
 // Custom Hook to generate event handlers for the validated Field
-const useFieldEventHandlers = (fieldName, fieldProps, fieldError) => {
+const useFieldEventHandlers = (fieldName, fieldProps) => {
   const {
     validateOnBlur,
     validateOnChange,
@@ -16,12 +16,8 @@ const useFieldEventHandlers = (fieldName, fieldProps, fieldError) => {
     useFormikContext();
 
   // Determine if and when you should be able to validate or revalidate a field
-  const canValidateOnBlur =
-    validateOnBlur &&
-    (!validateOnSubmit || (validateOnSubmit && fieldError !== undefined));
-  const canValidateOnChange =
-    validateOnChange &&
-    (!validateOnSubmit || (validateOnSubmit && fieldError !== undefined));
+  const canValidateOnBlur = validateOnBlur && !validateOnSubmit;
+  const canValidateOnChange = validateOnChange && !validateOnSubmit;
 
   const handleEvent = useCallback(
     (eventName, canValidate) => async (e) => {

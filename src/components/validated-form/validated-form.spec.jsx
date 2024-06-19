@@ -551,6 +551,31 @@ describe("ValidatedForm", () => {
           expect(onSubmit).not.toHaveBeenCalled();
         });
 
+        test("validations only run on submit", async () => {
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          const username = screen.getByLabelText("Username");
+
+          await act(async () => {
+            await user.click(username);
+            await user.type(username, "Jonathan");
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.queryByText("Username is required")).toBeNull();
+        });
+
         test("updating the form and submitting values", async () => {
           const username = screen.getByLabelText("Username");
           const email = screen.getByLabelText("Email");
@@ -633,6 +658,31 @@ describe("ValidatedForm", () => {
           expect(onSubmit).not.toHaveBeenCalled();
         });
 
+        test("validations only run on submit", async () => {
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          const username = screen.getByLabelText("Username");
+
+          await act(async () => {
+            await user.click(username);
+            await user.type(username, "Jonathan");
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.queryByText("Username is required")).toBeNull();
+        });
+
         test("updating the form and submitting values", async () => {
           const username = screen.getByLabelText("Username");
           const email = screen.getByLabelText("Email");
@@ -710,6 +760,31 @@ describe("ValidatedForm", () => {
           expect(onSubmit).not.toHaveBeenCalled();
         });
 
+        test("validations only run on submit", async () => {
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          const username = screen.getByLabelText("Username");
+
+          await act(async () => {
+            await user.click(username);
+            await user.type(username, "Jonathan");
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.queryByText("Username is required")).toBeNull();
+        });
+
         test("updating the form and submitting values", async () => {
           const username = screen.getByLabelText("Username");
           const email = screen.getByLabelText("Email");
@@ -783,6 +858,31 @@ describe("ValidatedForm", () => {
           expect(screen.getByText("Email is required")).toBeInTheDocument();
           expect(screen.getByText("2 errors")).toBeInTheDocument();
           expect(onSubmit).not.toHaveBeenCalled();
+        });
+
+        test("validations only run on submit", async () => {
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          const username = screen.getByLabelText("Username");
+
+          await act(async () => {
+            await user.click(username);
+            await user.type(username, "Jonathan");
+          });
+
+          expect(screen.getByText("Username is required")).toBeInTheDocument();
+
+          await act(async () => {
+            const saveButton = screen.getByRole("button", { name: "Save" });
+            await user.click(saveButton);
+          });
+
+          expect(screen.queryByText("Username is required")).toBeNull();
         });
 
         test("updating the form and submitting values", async () => {
