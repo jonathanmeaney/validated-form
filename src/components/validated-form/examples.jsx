@@ -13,6 +13,7 @@ import ValidatedForm, {
   ValidatedDateInput,
   ValidatedSwitch,
   ValidatedSelect,
+  Textbox,
   Option,
   ValidatedRadioButtonGroup,
   RadioButton,
@@ -735,6 +736,7 @@ const EveryInput = () => {
         supscriptionType: "",
         dob: "",
         dobNum: { dd: "", mm: "", yyyy: "" },
+        notRequired: "",
       }}
     >
       <ValidatedTextbox
@@ -743,6 +745,7 @@ const EveryInput = () => {
         validate={Yup.string().required("Username is required")}
         required
       />
+      <Textbox label="Not required" name="notRequired" />
       <ValidatedPassword
         label="Password"
         name="password"

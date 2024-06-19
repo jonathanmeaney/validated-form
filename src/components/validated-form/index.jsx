@@ -1,2 +1,2 @@
-export * from "./validated-inputs";
+export * from "./adapted-inputs";
 export { default } from "./validated-form";
