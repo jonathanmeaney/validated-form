@@ -26,10 +26,8 @@ const useValidatedField = (Component, { validate, ...otherProps }) => {
   // Register the components inputRef with the context. Used to set focus
   // from the ValidationSummary.
   useEffect(() => {
-    if (fieldName) {
-      registerInputRef(fieldName, inputRef);
-      if (!hasKey(values, fieldName)) setFieldValue(fieldName, fieldValue);
-    }
+    registerInputRef(fieldName, inputRef);
+    if (!hasKey(values, fieldName)) setFieldValue(fieldName, fieldValue);
 
     // When unmounting deregister
     return () => {
