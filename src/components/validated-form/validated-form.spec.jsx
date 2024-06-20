@@ -21,7 +21,7 @@ const mockScrollIntoView = jest.fn();
 window.HTMLElement.prototype.scrollIntoView = mockScrollIntoView;
 
 const customRender = async (ui) => {
-  render(
+  return render(
     <CarbonProvider theme={sageTheme} validationRedesignOptIn>
       {ui}
     </CarbonProvider>
@@ -910,9 +910,9 @@ describe("ValidatedForm", () => {
   });
 
   describe("when validateOnSubmit using withSummary", () => {
-    let form, summary;
-    beforeEach(() => {
-      customRender(
+    let form, summary, container;
+    beforeEach(async () => {
+      const renderValue = await customRender(
         <ValidatedForm
           validateOnSubmit
           withSummary
@@ -937,7 +937,8 @@ describe("ValidatedForm", () => {
           />
         </ValidatedForm>
       );
-
+      console.log({ renderValue });
+      container = renderValue.container;
       form = screen.getByTestId("test-form");
     });
 
@@ -945,7 +946,7 @@ describe("ValidatedForm", () => {
       expect(within(form).queryByText("Username is required")).toBeNull();
       expect(within(form).queryByText("Email is required")).toBeNull();
       expect(within(form).queryByText("2 errors")).toBeNull();
-      expect(screen.queryByTestId("validation-summary")).toBeNull();
+      expect(container.querySelector("#validation-summary")).toBeNull();
 
       // Blur each field
       const username = within(form).getByLabelText("Username");
@@ -960,14 +961,14 @@ describe("ValidatedForm", () => {
       expect(within(form).queryByText("Username is required")).toBeNull();
       expect(within(form).queryByText("Email is required")).toBeNull();
       expect(within(form).queryByText("2 errors")).toBeNull();
-      expect(screen.queryByTestId("validation-summary")).toBeNull();
+      expect(container.querySelector("#validation-summary")).toBeNull();
     });
 
     test("displaying validation errors on attempted submission", async () => {
       expect(within(form).queryByText("Username is required")).toBeNull();
       expect(within(form).queryByText("Email is required")).toBeNull();
       expect(within(form).queryByText("2 errors")).toBeNull();
-      expect(screen.queryByTestId("validation-summary")).toBeNull();
+      expect(container.querySelector("#validation-summary")).toBeNull();
 
       await act(async () => {
         const saveButton = screen.getByRole("button", { name: "Save" });
@@ -979,18 +980,20 @@ describe("ValidatedForm", () => {
       ).toBeInTheDocument();
       expect(within(form).getByText("Email is required")).toBeInTheDocument();
       expect(within(form).getByText("2 errors")).toBeInTheDocument();
-      expect(screen.queryByTestId("validation-summary")).toBeInTheDocument();
+      expect(
+        container.querySelector("#validation-summary")
+      ).toBeInTheDocument();
     });
 
     test("displaying validation summary on attempted submission", async () => {
-      expect(screen.queryByTestId("validation-summary")).toBeNull();
+      expect(container.querySelector("#validation-summary")).toBeNull();
 
       await act(async () => {
         const saveButton = screen.getByRole("button", { name: "Save" });
         await user.click(saveButton);
       });
 
-      summary = screen.queryByTestId("validation-summary");
+      summary = container.querySelector("#validation-summary");
       expect(summary).toBeInTheDocument();
       expect(
         within(summary).getByText("There are 2 errors")
@@ -1003,15 +1006,29 @@ describe("ValidatedForm", () => {
       ).toBeInTheDocument();
     });
 
-    test("clicking error to scroll to and focus field", async () => {
-      expect(screen.queryByTestId("validation-summary")).toBeNull();
+    test("clicking submit focuses the validation summary", async () => {
+      expect(container.querySelector("#validation-summary")).toBeNull();
 
       await act(async () => {
         const saveButton = screen.getByRole("button", { name: "Save" });
         await user.click(saveButton);
       });
 
-      summary = screen.queryByTestId("validation-summary");
+      summary = container.querySelector("#validation-summary");
+
+      expect(summary).toHaveFocus();
+      expect(mockScrollIntoView).toHaveBeenCalled();
+    });
+
+    test("clicking error to scroll to and focus field", async () => {
+      expect(container.querySelector("#validation-summary")).toBeNull();
+
+      await act(async () => {
+        const saveButton = screen.getByRole("button", { name: "Save" });
+        await user.click(saveButton);
+      });
+
+      summary = container.querySelector("#validation-summary");
 
       await act(async () => {
         const usernameLink = within(summary).getByText("Username is required");
@@ -1025,9 +1042,9 @@ describe("ValidatedForm", () => {
   });
 
   describe("when using a ValidatedRadioButtonGroup", () => {
-    let form, summary;
-    beforeEach(() => {
-      customRender(
+    let summary, container;
+    beforeEach(async () => {
+      const returnValue = await customRender(
         <ValidatedForm
           validateOnSubmit
           withSummary
@@ -1055,19 +1072,18 @@ describe("ValidatedForm", () => {
           </ValidatedRadioButtonGroup>
         </ValidatedForm>
       );
-
-      form = screen.getByTestId("test-form");
+      container = returnValue.container;
     });
 
     test("clicking error to scroll to the field", async () => {
-      expect(screen.queryByTestId("validation-summary")).toBeNull();
+      expect(container.querySelector("#validation-summary")).toBeNull();
 
       await act(async () => {
         const saveButton = screen.getByRole("button", { name: "Save" });
         await user.click(saveButton);
       });
 
-      summary = screen.queryByTestId("validation-summary");
+      summary = container.querySelector("#validation-summary");
 
       await act(async () => {
         const accountTypeLink = within(summary).getByText(

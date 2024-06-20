@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import I18n from "i18n-js";
 import { isEmpty } from "lodash";
@@ -55,7 +55,24 @@ const ErrorMessagesList = ({ errorMessages }) => {
   );
 };
 
-const ValidationSummary = ({ errorCount, errorMessages, summaryTitle }) => {
+const ValidationSummary = ({
+  errorCount,
+  errorMessages,
+  summaryTitle,
+  submitCount,
+}) => {
+  const summaryRef = useRef(null);
+
+  useEffect(() => {
+    const ref = summaryRef?.current;
+
+    /* istanbul ignore next */
+    if (ref && errorCount > 0) {
+      ref.focus();
+      ref.scrollIntoView({ behavior: "auto", block: "center" });
+    }
+  }, [errorCount, submitCount]);
+
   if (isEmpty(errorMessages)) {
     return false;
   }
@@ -67,21 +84,24 @@ const ValidationSummary = ({ errorCount, errorMessages, summaryTitle }) => {
       open
       mb={5}
       data-role="validation-summary"
+      id="validation-summary"
       title={
         <Typography variant="b" mb={2}>
           {title}
         </Typography>
       }
+      ref={summaryRef}
     >
       <ErrorMessagesList errorMessages={errorMessages} />
     </Message>
   );
 
-  return <div data-testid="validation-summary">{message}</div>;
+  return message;
 };
 
 ValidationSummary.propTypes = {
   errorCount: PropTypes.number,
+  submitCount: PropTypes.number,
   errorMessages: PropTypes.object,
   summaryTitle: PropTypes.string,
 };

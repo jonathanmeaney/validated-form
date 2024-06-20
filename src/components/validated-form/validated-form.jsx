@@ -53,7 +53,7 @@ const ValidatedForm = ({
         validateOnMount={canValidateOnMount}
         validate={validate}
       >
-        {({ handleSubmit, touched, errors, values, submitCount }) => {
+        {({ handleSubmit, touched, errors, submitCount }) => {
           // Only show the validation summary if the withSummary prop is true and
           // an actual attempt to submit has been made
           const canShowValidationSummary = submitCount > 0 && withSummary;
@@ -67,6 +67,7 @@ const ValidatedForm = ({
                   errorCount={errorCount}
                   errorMessages={errorMessages}
                   summaryTitle={summaryTitle}
+                  submitCount={submitCount}
                 />
               )}
               <Form

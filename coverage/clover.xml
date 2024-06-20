@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1718832007790" clover="3.2.0">
-  <project timestamp="1718832007790" name="All files">
-    <metrics statements="203" coveredstatements="201" conditionals="65" coveredconditionals="61" methods="38" coveredmethods="35" elements="306" coveredelements="297" complexity="0" loc="203" ncloc="203" packages="1" files="11" classes="11"/>
+<coverage generated="1718903013731" clover="3.2.0">
+  <project timestamp="1718903013732" name="All files">
+    <metrics statements="206" coveredstatements="204" conditionals="65" coveredconditionals="61" methods="39" coveredmethods="36" elements="310" coveredelements="301" complexity="0" loc="206" ncloc="206" packages="1" files="11" classes="11"/>
     <file name="adapted-inputs.jsx" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/adapted-inputs.jsx">
       <metrics statements="43" coveredstatements="43" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
       <line num="34" count="1" type="stmt"/>
@@ -17,7 +17,7 @@
       <line num="168" count="1" type="stmt"/>
       <line num="174" count="1" type="stmt"/>
       <line num="175" count="11" type="stmt"/>
-      <line num="176" count="3035" type="stmt"/>
+      <line num="176" count="3047" type="stmt"/>
       <line num="179" count="11" type="stmt"/>
       <line num="184" count="11" type="stmt"/>
       <line num="189" count="1" type="stmt"/>
@@ -66,12 +66,12 @@
     <file name="useFieldEventHandlers.js" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/useFieldEventHandlers.js">
       <metrics statements="16" coveredstatements="16" conditionals="12" coveredconditionals="12" methods="3" coveredmethods="3"/>
       <line num="7" count="1" type="stmt"/>
-      <line num="14" count="3035" type="stmt"/>
-      <line num="16" count="3035" type="stmt"/>
-      <line num="19" count="3035" type="cond" truecount="2" falsecount="0"/>
-      <line num="20" count="3035" type="cond" truecount="2" falsecount="0"/>
-      <line num="22" count="3035" type="stmt"/>
-      <line num="23" count="6070" type="stmt"/>
+      <line num="14" count="3047" type="stmt"/>
+      <line num="16" count="3047" type="stmt"/>
+      <line num="19" count="3047" type="cond" truecount="2" falsecount="0"/>
+      <line num="20" count="3047" type="cond" truecount="2" falsecount="0"/>
+      <line num="22" count="3047" type="stmt"/>
+      <line num="23" count="6094" type="stmt"/>
       <line num="24" count="443" type="stmt"/>
       <line num="26" count="443" type="cond" truecount="2" falsecount="0"/>
       <line num="27" count="52" type="stmt"/>
@@ -80,94 +80,94 @@
       <line num="35" count="72" type="stmt"/>
       <line num="37" count="189" type="stmt"/>
       <line num="43" count="443" type="stmt"/>
-      <line num="53" count="3035" type="stmt"/>
+      <line num="53" count="3047" type="stmt"/>
     </file>
     <file name="useFieldValidation.js" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/useFieldValidation.js">
       <metrics statements="11" coveredstatements="11" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
       <line num="3" count="1" type="stmt"/>
-      <line num="4" count="3035" type="stmt"/>
-      <line num="6" count="1241" type="cond" truecount="2" falsecount="0"/>
-      <line num="8" count="863" type="cond" truecount="2" falsecount="0"/>
-      <line num="9" count="713" type="stmt"/>
-      <line num="10" count="713" type="stmt"/>
-      <line num="12" count="250" type="stmt"/>
+      <line num="4" count="3047" type="stmt"/>
+      <line num="6" count="1243" type="cond" truecount="2" falsecount="0"/>
+      <line num="8" count="865" type="cond" truecount="2" falsecount="0"/>
+      <line num="9" count="715" type="stmt"/>
+      <line num="10" count="715" type="stmt"/>
+      <line num="12" count="252" type="stmt"/>
       <line num="15" count="150" type="stmt"/>
       <line num="16" count="150" type="stmt"/>
       <line num="25" count="463" type="stmt"/>
-      <line num="29" count="3035" type="stmt"/>
+      <line num="29" count="3047" type="stmt"/>
     </file>
     <file name="useValidatedField.jsx" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/useValidatedField.jsx">
       <metrics statements="20" coveredstatements="20" conditionals="8" coveredconditionals="8" methods="4" coveredmethods="4"/>
       <line num="10" count="1" type="stmt"/>
-      <line num="11" count="3035" type="stmt"/>
-      <line num="12" count="3035" type="stmt"/>
-      <line num="14" count="3035" type="stmt"/>
-      <line num="17" count="3035" type="stmt"/>
-      <line num="19" count="3035" type="stmt"/>
-      <line num="20" count="3035" type="stmt"/>
-      <line num="21" count="3035" type="stmt"/>
-      <line num="22" count="3035" type="stmt"/>
-      <line num="23" count="3035" type="cond" truecount="2" falsecount="0"/>
-      <line num="24" count="3035" type="cond" truecount="4" falsecount="0"/>
-      <line num="28" count="3035" type="stmt"/>
-      <line num="29" count="93" type="stmt"/>
-      <line num="30" count="93" type="cond" truecount="2" falsecount="0"/>
-      <line num="33" count="93" type="stmt"/>
-      <line num="34" count="93" type="stmt"/>
-      <line num="35" count="93" type="stmt"/>
-      <line num="36" count="93" type="stmt"/>
-      <line num="41" count="3035" type="stmt"/>
-      <line num="43" count="3035" type="stmt"/>
+      <line num="11" count="3047" type="stmt"/>
+      <line num="12" count="3047" type="stmt"/>
+      <line num="14" count="3047" type="stmt"/>
+      <line num="17" count="3047" type="stmt"/>
+      <line num="19" count="3047" type="stmt"/>
+      <line num="20" count="3047" type="stmt"/>
+      <line num="21" count="3047" type="stmt"/>
+      <line num="22" count="3047" type="stmt"/>
+      <line num="23" count="3047" type="cond" truecount="2" falsecount="0"/>
+      <line num="24" count="3047" type="cond" truecount="4" falsecount="0"/>
+      <line num="28" count="3047" type="stmt"/>
+      <line num="29" count="95" type="stmt"/>
+      <line num="30" count="95" type="cond" truecount="2" falsecount="0"/>
+      <line num="33" count="95" type="stmt"/>
+      <line num="34" count="95" type="stmt"/>
+      <line num="35" count="95" type="stmt"/>
+      <line num="36" count="95" type="stmt"/>
+      <line num="41" count="3047" type="stmt"/>
+      <line num="43" count="3047" type="stmt"/>
     </file>
     <file name="utils.js" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/utils.js">
       <metrics statements="53" coveredstatements="51" conditionals="17" coveredconditionals="13" methods="9" coveredmethods="8"/>
       <line num="3" count="1" type="stmt"/>
-      <line num="4" count="1385" type="stmt"/>
-      <line num="5" count="1385" type="stmt"/>
-      <line num="6" count="1385" type="stmt"/>
-      <line num="7" count="1385" type="stmt"/>
-      <line num="9" count="1385" type="stmt"/>
-      <line num="21" count="1385" type="stmt"/>
+      <line num="4" count="1390" type="stmt"/>
+      <line num="5" count="1390" type="stmt"/>
+      <line num="6" count="1390" type="stmt"/>
+      <line num="7" count="1390" type="stmt"/>
+      <line num="9" count="1390" type="stmt"/>
+      <line num="21" count="1390" type="stmt"/>
       <line num="28" count="1" type="stmt"/>
       <line num="29" count="62" type="stmt"/>
       <line num="30" count="62" type="stmt"/>
       <line num="31" count="62" type="cond" truecount="1" falsecount="1"/>
       <line num="34" count="1" type="stmt"/>
-      <line num="35" count="2770" type="stmt"/>
-      <line num="37" count="2770" type="cond" truecount="1" falsecount="0"/>
-      <line num="38" count="2832" type="stmt"/>
-      <line num="40" count="2210" type="cond" truecount="2" falsecount="0"/>
-      <line num="42" count="2210" type="cond" truecount="4" falsecount="0"/>
+      <line num="35" count="2780" type="stmt"/>
+      <line num="37" count="2780" type="cond" truecount="1" falsecount="0"/>
+      <line num="38" count="2842" type="stmt"/>
+      <line num="40" count="2222" type="cond" truecount="2" falsecount="0"/>
+      <line num="42" count="2222" type="cond" truecount="4" falsecount="0"/>
       <line num="43" count="62" type="stmt"/>
-      <line num="45" count="2148" type="stmt"/>
-      <line num="50" count="2770" type="stmt"/>
-      <line num="51" count="2770" type="stmt"/>
+      <line num="45" count="2160" type="stmt"/>
+      <line num="50" count="2780" type="stmt"/>
+      <line num="51" count="2780" type="stmt"/>
       <line num="55" count="1" type="stmt"/>
-      <line num="61" count="9106" type="stmt"/>
-      <line num="62" count="9106" type="stmt"/>
-      <line num="64" count="9106" type="stmt"/>
-      <line num="65" count="9306" type="cond" truecount="2" falsecount="0"/>
-      <line num="66" count="3944" type="stmt"/>
-      <line num="68" count="5362" type="stmt"/>
-      <line num="71" count="5162" type="stmt"/>
+      <line num="61" count="9142" type="stmt"/>
+      <line num="62" count="9142" type="stmt"/>
+      <line num="64" count="9142" type="stmt"/>
+      <line num="65" count="9342" type="cond" truecount="2" falsecount="0"/>
+      <line num="66" count="3956" type="stmt"/>
+      <line num="68" count="5386" type="stmt"/>
+      <line num="71" count="5186" type="stmt"/>
       <line num="74" count="1" type="stmt"/>
-      <line num="80" count="93" type="stmt"/>
-      <line num="81" count="93" type="stmt"/>
-      <line num="82" count="93" type="stmt"/>
-      <line num="85" count="93" type="stmt"/>
+      <line num="80" count="95" type="stmt"/>
+      <line num="81" count="95" type="stmt"/>
+      <line num="82" count="95" type="stmt"/>
+      <line num="85" count="95" type="stmt"/>
       <line num="86" count="3" type="stmt"/>
       <line num="92" count="3" type="stmt"/>
       <line num="93" count="3" type="stmt"/>
-      <line num="97" count="93" type="stmt"/>
-      <line num="98" count="93" type="cond" truecount="1" falsecount="1"/>
-      <line num="99" count="93" type="stmt"/>
-      <line num="102" count="93" type="stmt"/>
+      <line num="97" count="95" type="stmt"/>
+      <line num="98" count="95" type="cond" truecount="1" falsecount="1"/>
+      <line num="99" count="95" type="stmt"/>
+      <line num="102" count="95" type="stmt"/>
       <line num="106" count="1" type="stmt"/>
-      <line num="112" count="93" type="stmt"/>
-      <line num="113" count="93" type="stmt"/>
-      <line num="115" count="93" type="stmt"/>
-      <line num="120" count="91" type="stmt"/>
-      <line num="123" count="88" type="stmt"/>
+      <line num="112" count="95" type="stmt"/>
+      <line num="113" count="95" type="stmt"/>
+      <line num="115" count="95" type="stmt"/>
+      <line num="120" count="93" type="stmt"/>
+      <line num="123" count="90" type="stmt"/>
       <line num="126" count="1" type="stmt"/>
       <line num="127" count="443" type="cond" truecount="1" falsecount="1"/>
       <line num="128" count="0" type="stmt"/>
@@ -180,25 +180,25 @@
       <line num="10" count="1" type="stmt"/>
       <line num="20" count="1" type="stmt"/>
       <line num="25" count="1" type="stmt"/>
-      <line num="26" count="137" type="cond" truecount="2" falsecount="0"/>
-      <line num="28" count="93" type="stmt"/>
-      <line num="29" count="93" type="stmt"/>
-      <line num="34" count="93" type="stmt"/>
-      <line num="40" count="44" type="stmt"/>
-      <line num="41" count="44" type="stmt"/>
-      <line num="45" count="44" type="stmt"/>
-      <line num="47" count="44" type="stmt"/>
+      <line num="26" count="140" type="cond" truecount="2" falsecount="0"/>
+      <line num="28" count="95" type="stmt"/>
+      <line num="29" count="95" type="stmt"/>
+      <line num="34" count="95" type="stmt"/>
+      <line num="40" count="45" type="stmt"/>
+      <line num="41" count="45" type="stmt"/>
+      <line num="45" count="45" type="stmt"/>
+      <line num="47" count="45" type="stmt"/>
       <line num="58" count="1" type="stmt"/>
-      <line num="65" count="6078" type="stmt"/>
+      <line num="65" count="6104" type="stmt"/>
       <line num="67" count="1" type="stmt"/>
-      <line num="76" count="100" type="stmt"/>
-      <line num="87" count="100" type="stmt"/>
-      <line num="88" count="93" type="stmt"/>
-      <line num="95" count="100" type="stmt"/>
-      <line num="96" count="93" type="stmt"/>
-      <line num="104" count="100" type="stmt"/>
-      <line num="105" count="95" type="stmt"/>
-      <line num="112" count="100" type="stmt"/>
+      <line num="76" count="102" type="stmt"/>
+      <line num="87" count="102" type="stmt"/>
+      <line num="88" count="95" type="stmt"/>
+      <line num="95" count="102" type="stmt"/>
+      <line num="96" count="95" type="stmt"/>
+      <line num="104" count="102" type="stmt"/>
+      <line num="105" count="97" type="stmt"/>
+      <line num="112" count="102" type="stmt"/>
       <line num="119" count="1" type="stmt"/>
       <line num="132" count="1" type="stmt"/>
       <line num="141" count="1" type="stmt"/>
@@ -207,36 +207,39 @@
     <file name="validated-form.jsx" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/validated-form.jsx">
       <metrics statements="11" coveredstatements="11" conditionals="16" coveredconditionals="16" methods="3" coveredmethods="3"/>
       <line num="12" count="1" type="stmt"/>
-      <line num="27" count="50" type="cond" truecount="2" falsecount="0"/>
-      <line num="28" count="50" type="cond" truecount="2" falsecount="0"/>
-      <line num="29" count="50" type="cond" truecount="2" falsecount="0"/>
-      <line num="31" count="50" type="stmt"/>
+      <line num="27" count="51" type="cond" truecount="2" falsecount="0"/>
+      <line num="28" count="51" type="cond" truecount="2" falsecount="0"/>
+      <line num="29" count="51" type="cond" truecount="2" falsecount="0"/>
+      <line num="31" count="51" type="stmt"/>
       <line num="46" count="11" type="stmt"/>
-      <line num="59" count="1385" type="cond" truecount="2" falsecount="0"/>
-      <line num="62" count="1385" type="stmt"/>
-      <line num="63" count="1385" type="stmt"/>
-      <line num="87" count="1" type="stmt"/>
-      <line num="102" count="1" type="stmt"/>
+      <line num="59" count="1390" type="cond" truecount="2" falsecount="0"/>
+      <line num="62" count="1390" type="stmt"/>
+      <line num="63" count="1390" type="stmt"/>
+      <line num="88" count="1" type="stmt"/>
+      <line num="103" count="1" type="stmt"/>
     </file>
     <file name="validation-summary.jsx" path="/Users/jonathanmeaney/Development/react/validated-form/src/components/validated-form/validation-summary.jsx">
-      <metrics statements="17" coveredstatements="17" conditionals="4" coveredconditionals="4" methods="4" coveredmethods="4"/>
+      <metrics statements="20" coveredstatements="20" conditionals="4" coveredconditionals="4" methods="5" coveredmethods="5"/>
       <line num="15" count="1" type="stmt"/>
       <line num="17" count="1" type="stmt"/>
       <line num="25" count="1" type="stmt"/>
-      <line num="26" count="8" type="stmt"/>
-      <line num="28" count="8" type="stmt"/>
-      <line num="29" count="14" type="stmt"/>
+      <line num="26" count="10" type="stmt"/>
+      <line num="28" count="10" type="stmt"/>
+      <line num="29" count="18" type="stmt"/>
       <line num="30" count="2" type="stmt"/>
-      <line num="39" count="14" type="stmt"/>
-      <line num="48" count="8" type="stmt"/>
+      <line num="39" count="18" type="stmt"/>
+      <line num="48" count="10" type="stmt"/>
       <line num="58" count="1" type="stmt"/>
-      <line num="59" count="16" type="cond" truecount="2" falsecount="0"/>
-      <line num="60" count="8" type="stmt"/>
-      <line num="63" count="8" type="cond" truecount="2" falsecount="0"/>
-      <line num="65" count="8" type="stmt"/>
-      <line num="80" count="8" type="stmt"/>
-      <line num="83" count="1" type="stmt"/>
-      <line num="89" count="1" type="stmt"/>
+      <line num="64" count="20" type="stmt"/>
+      <line num="66" count="20" type="stmt"/>
+      <line num="67" count="10" type="stmt"/>
+      <line num="76" count="20" type="cond" truecount="2" falsecount="0"/>
+      <line num="77" count="10" type="stmt"/>
+      <line num="80" count="10" type="cond" truecount="2" falsecount="0"/>
+      <line num="82" count="10" type="stmt"/>
+      <line num="99" count="10" type="stmt"/>
+      <line num="102" count="1" type="stmt"/>
+      <line num="109" count="1" type="stmt"/>
     </file>
   </project>
 </coverage>
